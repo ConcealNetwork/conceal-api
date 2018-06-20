@@ -1,5 +1,5 @@
 # conceal-js
-Javascript/Node.js interface to Conceal cryptocurrency RPC/API. Currenty on the wallet RPC is available.
+Javascript/Node.js interface to Conceal cryptocurrency RPC/API. Currenty only the wallet RPC is available.
 
 ## Quick start
 ```
