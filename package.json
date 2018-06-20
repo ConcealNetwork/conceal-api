@@ -1,0 +1,25 @@
+{
+  "name": "conceal-js",
+  "version": "0.1.0",
+  "description": "Javascript interface to Conceal cryptocurrency RPC/API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheCircleFoundation/conceal-js.git"
+  },
+  "keywords": [
+    "conceal",
+    "cryptocurrency",
+    "rpc",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TheCircleFoundation/conceal-js/issues"
+  },
+  "homepage": "https://github.com/TheCircleFoundation/conceal-js#readme"
+}
