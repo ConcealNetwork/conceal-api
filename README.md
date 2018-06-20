@@ -48,7 +48,7 @@ ccx.send(opts)
 ```
 ccx.reset() // discard wallet cache and resync with block chain
 ```
-#### Save wallet
+#### Store wallet
 ```
 ccx.store() // save wallet cache to disk
 ```
