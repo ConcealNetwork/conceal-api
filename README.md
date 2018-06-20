@@ -67,7 +67,7 @@ const opts = {
 }
 ccx.messages(opts) // opts can be omitted
 ```
-#### Get payments
+#### Get incoming payments
 ```
 const paymentId = PAYMENT_ID, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b' 
 ccx.payments(paymentId)
