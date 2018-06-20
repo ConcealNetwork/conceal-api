@@ -16,8 +16,7 @@ $ node test.js
 ```
 The test program could contain, for example, a simple payment
 ```
-require('conceal-js')
-
+const CCX = require('conceal-js')
 const ccx = new CCX('3333') // Port 3333 on localhost
 
 ccx.send({
