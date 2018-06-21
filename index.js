@@ -166,9 +166,8 @@ function request (port, post, resolve, reject) {
       let data = Buffer.alloc(0)
       res.on('data', (chunk) => { data = Buffer.concat([data, chunk]) })
       res.on('end', () => {
-        data = JSON.parse(data.toString())
-        if (data.error) reject(data.error.message)
-        else resolve(data.result)
+        try { data = JSON.parse(data.toString()) } catch (err) { reject(err.message); return }
+        resolve(data.result)
       })
     }
   ).on('error', (err) => { reject('http error') }).end(post)
