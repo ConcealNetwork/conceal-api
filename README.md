@@ -164,7 +164,7 @@ ccx.submitBlock(block)
 ```
 #### Stop mining
 ```
-ccx.stopMining(block)
+ccx.stopMining()
 ```
 #### Start mining
 ```
