@@ -37,7 +37,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
 
 #### Get height
 ```
-ccx.height() // get block chain height
+ccx.height() // get last block height
 ```
 #### Get balance
 ```
@@ -85,15 +85,15 @@ ccx.send(opts)
 
 #### Get info
 ```
-ccx.info() // get information about the block chain
+ccx.info() // get information about the block chain, including next block height
 ```
 #### Get index
 ```
-ccx.index() // get block chain height
+ccx.index() // get next block height
 ```
 #### Get count
 ```
-ccx.count() // get block chain height
+ccx.count() // get next block height
 ```
 #### Get block hash by height
 ```
