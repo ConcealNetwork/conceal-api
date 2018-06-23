@@ -33,17 +33,46 @@ const ccx = new CCX(host, walletRpcPort, daemonRpcPort)
 ```
 ccx.rpc returns a promise, where *rpc* is any of the methods below:
 
-### Wallet RPC (must provide walletRpcPort)
+* [Wallet RPC](#wallet)
+  * [Get height](#height)
+  * [Get balance](#balance)
+  * [Get messages](#messages)
+  * [Get payments](#payments)
+  * [Get transfers](#transfers)
+  * [Get reset](#reset)
+  * [Get store](#store)
+  * [Get send](#send)
+* [Daemon RPC](#daemon)
+  * [Get info](#info)
+  * [Get index](#index)
+  * [Get count](#count)
+  * [Get block hash by height](#blockHashByHeight)
+  * [Get block header by height](#blockHeaderByHeight)
+  * [Get block header by hash](#blockHeaderByHash)
+  * [Get last block header](#lastBlockHeader)
+  * [Get block](#block)
+  * [Get blocks](#blocks)
+  * [Get transaction](#transaction)
+  * [Get transaction pool](#transactionPool)
+  * [Get currency ID](#currencyId)
+  * [Get transactions](#transactions)
+  * [Send raw transaction](#sendRawTransaction)
+  * [Get block template](#blockTemplate)
+  * [Submit block](#submitBlock)
+  * [Stop mining](#stopMining)
+  * [Start mining](#startMining)
 
-#### Get height
+### <a name="wallet"></a>Wallet RPC (must provide walletRpcPort)
+
+#### <a name="height"></a>Get height
 ```
 ccx.height() // get last block height
 ```
-#### Get balance
+#### <a name="balance">Get balance
 ```
 ccx.balance // get wallet balances
 ```
-#### Get messages
+#### <a name="messages">Get messages
 ```
 const opts = {
   firstTxId: FIRST_TX_ID, // (integer, optional), ex: 10
@@ -51,24 +80,24 @@ const opts = {
 }
 ccx.messages(opts) // opts can be omitted
 ```
-#### Get incoming payments
+#### <a name="payments">Get incoming payments
 ```
 const paymentId = PAYMENT_ID, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.payments(paymentId)
 ```
-#### Get transfers
+#### <a name="transfers">Get transfers
 ```
 ccx.transfers() // gets all transfers (transactions)
 ```
-#### Reset wallet
+#### <a name="reset">Reset wallet
 ```
 ccx.reset() // discard wallet cache and resync with block chain
 ```
-#### Store wallet
+#### <a name="store">Store wallet
 ```
 ccx.store() // save wallet cache to disk
 ```
-#### Send payment
+#### <a name="send">Send payment
 ```
 const opts = {
   address: ADDRESS, // destination address (string, required), ex: 'ccx7Xd...'
@@ -81,73 +110,73 @@ const opts = {
 }
 ccx.send(opts)
 ```
-### Daemon RPC (must provide daemonRpcPort)
+### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 
-#### Get info
+#### <a name="info">Get info
 ```
 ccx.info() // get information about the block chain, including next block height
 ```
-#### Get index
+#### <a name="index">Get index
 ```
 ccx.index() // get next block height
 ```
-#### Get count
+#### <a name="count">Get count
 ```
 ccx.count() // get next block height
 ```
-#### Get block hash by height
+#### <a name="blockHashByHeight">Get block hash by height
 ```
 const height = HEIGHT, // (non-negative integer, required), ex: 12750
 ccx.blockHashByHeight(height) // get block hash given height
 ```
-#### Get block header by height
+#### <a name="blockHeaderByHeight">Get block header by height
 ```
 const height = HEIGHT, // (non-negative integer, required), ex: 12750
 ccx.blockHeaderByHeight(height) // get block header given height
 ```
-#### Get block header by hash
+#### <a name="blockHeaderByHash">Get block header by hash
 ```
 const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.blockHeaderByHash(hash) // get block header given hash
 ```
-#### Get last block header
+#### <a name="lastBlockHeader">Get last block header
 ```
 ccx.lastBlockHeader()
 ```
-#### Get block
+#### <a name="block">Get block
 ```
 const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.block(hash)
 ```
-#### Get blocks
+#### <a name="blocks">Get blocks
 ```
 const height = HEIGHT, // (non-negative integer, required), ex: 12750
 ccx.blocks(height) // returns 31 blocks up to and including *height*
 ```
-#### Get transaction
+#### <a name="transaction">Get transaction
 ```
 const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.transaction(hash)
 ```
-#### Get transaction pool
+#### <a name="transactionPool">Get transaction pool
 ```
 ccx.transactionPool()
 ```
-#### Get currency ID
+#### <a name="currencyId">Get currency ID
 ```
 ccx.currencyId()
 ```
-#### Get transactions
+#### <a name="transactions">Get transactions
 ```
 const arr = [HASH1, HASH2, ...] // (array of 64-digit hexadecimal strings, required), ex: ['0ab1...3f4b']
 ccx.transactions(arr)
 ```
-#### Send raw transaction
+#### <a name="sendRawTransaction">Send raw transaction
 ```
 const transaction = TRANSACTION // transaction blob (hexadecimal string, required), ex: ''01d86301...'
 ccx.sendRawTransaction(transaction)
 ```
-#### Get block template
+#### <a name="blockTemplate">Get block template
 ```
 const address = ADDRESS // destination address (string, required), ex: 'ccx7Xd...'
 const reserveSize = RESERVE_SIZE // bytes to reserve in block for work, etc. (non-negative integer < 256, optional, default 14), ex: 255
@@ -157,16 +186,16 @@ const opts = {
 }
 ccx.blockTemplate(opts)
 ```
-#### Submit block
+#### <a name="submitBlock">Submit block
 ```
 const block = BLOCK // block blob (hexadecimal string, required), ex: '0300cb9eb...'
 ccx.submitBlock(block)
 ```
-#### Stop mining
+#### <a name="stopMining">Stop mining
 ```
 ccx.stopMining()
 ```
-#### Start mining
+#### <a name="startMining">Start mining
 ```
 const address = ADDRESS // mining address (string, required), ex: 'ccx7Xd...'
 const threads = THREADS // number of concurrent mining threads (non-negative integer, optional, default 0), ex: 2
