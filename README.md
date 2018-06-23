@@ -27,10 +27,10 @@ ccx.send({
 .catch((err) => { console.log(err) }) // display error message upon failure
 ```
 ## API
-
+```
 const CCX = require('conceal-js')
 const ccx = new CCX(host, walletRpcPort, daemonRpcPort)
-
+```
 ccx.rpc returns a promise, where *rpc* is any of the methods below:
 
 ### Wallet RPC (must provide walletRpcPort)
