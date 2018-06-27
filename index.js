@@ -5,11 +5,13 @@ const https = require('https')
 
 const err = {
   nonNeg: ' must be a non-negative integer',
-  nonHex: ' must be a hexadecimal string',
+  hex: ' must be a hexadecimal string',
   opts: 'opts must be object',
   hex64: ' must be 64-digit hexadecimal string',
   dec: ' must be decimal amount of CCX',
-  addr: 'address must be 98-character string beginning with ccx',
+  addr: ' must be 98-character string beginning with ccx',
+  arr:  ' must be an array',
+  str: ' must be a string'
 }
 
 function CCX (host, walletRpcPort, daemonRpcPort) {
@@ -23,7 +25,11 @@ function CCX (host, walletRpcPort, daemonRpcPort) {
   this.daemonRpcPort = daemonRpcPort
 }
 
-// Wallet RPC
+// Wallet RPC -- concealwallet
+
+function wrpc (that, method, params, resolve, reject) {
+  request(that.protocol, that.host, that.walletRpcPort, buildRpc(method, params), '/json_rpc', resolve, reject)
+}
 
 CCX.prototype.height = function () {
   return new Promise((resolve, reject) => {
@@ -39,10 +45,9 @@ CCX.prototype.balance = function () {
 
 CCX.prototype.messages = function (opts) {
   return new Promise((resolve, reject) => {
-    if (!opts) opts = {}
-    if (typeof opts !== 'object') reject(err.opts)
-    else if (opts.firstTxId && !isNonNegative(opts.firstTxId)) reject('firstTxId' + err.nonNeg)
-    else if (opts.txLimit && !isNonNegative(opts.txLimit)) reject('txLimit' + err.nonNeg)
+    if (!isObject(opts)) reject(err.opts)
+    else if (!isUndefined(opts.firstTxId) && !isNonNegative(opts.firstTxId)) reject('firstTxId' + err.nonNeg)
+    else if (!isUndefined(opts.txLimit) && !isNonNegative(opts.txLimit)) reject('txLimit' + err.nonNeg)
     else {
       obj = {}
       if (opts.firstTxId) obj.first_tx_id = opts.firstTxId
@@ -54,7 +59,7 @@ CCX.prototype.messages = function (opts) {
 
 CCX.prototype.payments = function (paymentId) { // incoming payments
   return new Promise((resolve, reject) => {
-    if (paymentId && !isHex64String(paymentId)) reject('paymentId' + err.hex64)
+    if (!isHex64String(paymentId)) reject('paymentId' + err.hex64)
     else wrpc(this, 'get_payments', { payment_id: paymentId }, resolve, reject)
   })
 }
@@ -81,40 +86,73 @@ CCX.prototype.send = function (opts) {
   const MAX_MIXIN = 10
   const DEFAULT_MIXIN = 2
   const DEFAULT_UNLOCK_TIME = 0
-  const DEFAULT_FEE = 10
+  const DEFAULT_FEE = 0.00001
+  const DEFAULT_MEMO_CHARACTER_FEE = 0.00001
 
   return new Promise((resolve, reject) => {
-    if (typeof opts !== 'object') reject(err.opts)
-    else if (!opts.address || !opts.amount) reject('address and amount are required')
-    else if (typeof opts.address != 'string' || opts.address.length !== 98 || opts.address.slice(0, 3) != 'ccx') reject(err.addr)
+    if (!isObject(opts)) reject(err.opts)
+    else if (typeof opts !== 'object') reject(err.opts)
+    else if (!isAddress(opts.address)) reject('address' + err.addr)
     else if (!isNumeric(opts.amount)) reject('amount' + err.dec)
-    else if (opts.fee && !isNumeric(opts.fee)) reject('fee' + err.dec)
-    else if (opts.paymentId && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
-    else if (opts.memo && typeof opts.memo !== 'string') reject('memo must be string')
+    else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
+    else if (!isUndefined(opts.memo) && (typeof opts.memo !== 'string')) reject('memo' + err.str)
     else {
-      if (!opts.mixIn) opts.mixIn = DEFAULT_MIXIN
+      if (isUndefined(opts.mixIn)) opts.mixIn = DEFAULT_MIXIN
       if(!(opts.mixIn >= 0 && opts.mixIn <= MAX_MIXIN)) reject('0 <= mixIn <= 10')
       else {
-        if (!opts.unlockHeight) opts.unlockHeight = DEFAULT_UNLOCK_TIME
-        if(!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
+        if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_TIME
+        if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
         else {
-          const d = { address: opts.address, amount: CCXToRaw(opts.amount) }
-          if (opts.memo) d.message = opts.memo
-          const obj = { destinations: [d], mixin: opts.mixIn, unlock_time: opts.unlockHeight }
-          obj.fee = opts.fee ? CCXToRaw(opts.fee) : DEFAULT_FEE
-          if (opts.paymentId) obj.payment_id = opts.paymentId
-          wrpc(this, 'transfer', obj, resolve, reject)
+          if (isUndefined(opts.fee)) opts.fee = DEFAULT_FEE + (!isUndefined(opts.memo) ? opts.memo.length * DEFAULT_MEMO_CHARACTER_FEE : 0)
+          if (!isNumeric(opts.fee)) reject('fee' + err.dec)
+          else {
+            const d = { address: opts.address, amount: CCXToRaw(opts.amount) }
+            if (opts.memo) d.message = opts.memo
+            const obj = { destinations: [d], mixin: opts.mixIn, fee: CCXToRaw(opts.fee), unlock_time: opts.unlockHeight }
+            if (opts.paymentId) obj.payment_id = opts.paymentId
+            wrpc(this, 'transfer', obj, resolve, reject)
+          }
         }
       }
     }
   })
 }
 
-function wrpc (that, method, params, resolve, reject) {
-  request(that.protocol, that.host, that.walletRpcPort, buildRpc(method, params), '/json_rpc', resolve, reject)
+// Wallet RPC -- walletd
+
+CCX.prototype.status = function () {
+  return new Promise((resolve, reject) => {
+    wrpc(this, 'getBalance', { }, resolve, reject)
+  })
+}
+
+CCX.prototype.getTransactions = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts)
+    else if (!isNonNegative(opts.blockCount)) reject('blockCount' + err.nonNeg)
+    else if (!isUndefined(opts.firstBlockIndex) && !isUndefined(opts.blockHash)) reject('either firstBlockIndex or blockHash is required')
+    else if (!isUndefined(opts.firstBlockIndex) && !isNonNegative(opts.firstBlockIndex)) reject('firstBlockIndex' + err.nonNeg)
+    else if (!isUndefined(opts.blockHash) && !isHex64String(opts.blockHash)) reject('blockHash' + err.hex64)
+    else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
+    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses which' + err.addr)
+    else {
+      const obj = {
+        blockHash: opts.blockHash,
+        firstBlockIndex: opts.firstBlockIndex,
+        blockCount: opts.blockCount,
+        addresses: opts.addresses,
+        paymentId: opts.paymentId
+      }
+      wrpc(this, 'getTransactions', obj, resolve, reject)
+    }
+  })
 }
 
 // Daemon RPC - JSON RPC
+
+function drpc (that, method, params, resolve, reject) {
+  request(that.protocol, that.host, that.daemonRpcPort, buildRpc(method, params), '/json_rpc', resolve, reject)
+}
 
 CCX.prototype.count = function () {
   return new Promise((resolve, reject) => {
@@ -124,21 +162,21 @@ CCX.prototype.count = function () {
 
 CCX.prototype.blockHashByHeight = function (height) {
   return new Promise((resolve, reject) => {
-    if (!height || !isNonNegative(height)) reject('height' + err.nonNeg)
+    if (!isNonNegative(height)) reject('height' + err.nonNeg)
     else drpc(this, 'on_getblockhash', [ height ], resolve, reject)
   })
 }
 
 CCX.prototype.blockHeaderByHash = function (hash) {
   return new Promise((resolve, reject) => {
-    if (!hash || !isHex64String(hash)) reject('hash' + err.hex64)
+    if (!isHex64String(hash)) reject('hash' + err.hex64)
     else drpc(this, 'getblockheaderbyhash', { hash: hash }, resolve, reject)
   })
 }
 
 CCX.prototype.blockHeaderByHeight = function (height) {
   return new Promise((resolve, reject) => {
-    if (!height || !isNonNegative(height)) reject('height' + err.nonNeg)
+    if (!isNonNegative(height)) reject('height' + err.nonNeg)
     else drpc(this, 'getblockheaderbyheight', { height: height }, resolve, reject)
   })
 }
@@ -151,21 +189,21 @@ CCX.prototype.lastBlockHeader = function () {
 
 CCX.prototype.block = function (hash) {
   return new Promise((resolve, reject) => {
-    if (!hash || !isHex64String(hash)) reject('hash' + err.hex64)
+    if (!isHex64String(hash)) reject('hash' + err.hex64)
     else drpc(this, 'f_block_json', { hash: hash }, resolve, reject)
   })
 }
 
 CCX.prototype.blocks = function (height) {
   return new Promise((resolve, reject) => {
-    if (!height || !isNonNegative(height)) reject('height' + err.nonNeg)
+    if (!isNonNegative(height)) reject('height' + err.nonNeg)
     else drpc(this, 'f_blocks_list_json', { height: height }, resolve, reject)
   })
 }
 
 CCX.prototype.transaction = function (hash) {
   return new Promise((resolve, reject) => {
-    if (!hash || !isHex64String(hash)) reject('hash' + err.hex64)
+    if (!isHex64String(hash)) reject('hash' + err.hex64)
     else drpc(this, 'f_transaction_json', { hash: hash }, resolve, reject)
   })
 }
@@ -184,9 +222,8 @@ CCX.prototype.currencyId = function () {
 
 CCX.prototype.blockTemplate = function (opts) {
   return new Promise((resolve, reject) => {
-    if (typeof opts !== 'object') reject(err.opts)
-    else if (!opts.address || !opts.reserveSize) reject('address and reserveSize are required')
-    else if (typeof opts.address != 'string' || opts.address.length !== 98 || opts.address.slice(0, 3) != 'ccx') reject(err.addr)
+    if (!isObject(opts)) reject(err.opts)
+    else if (!isAddress(opts.address)) reject('address' + err.addr)
     else if (!isNonNegative(opts.reserveSize) || opts.reserveSize > 255) reject('0 <= reserveSize <= 255')
     else drpc(this, 'getblocktemplate', { wallet_address: opts.address, reserve_size: opts.reserveSize }, resolve, reject)
   })
@@ -194,16 +231,16 @@ CCX.prototype.blockTemplate = function (opts) {
 
 CCX.prototype.submitBlock = function (block) {
   return new Promise((resolve, reject) => {
-    if (!block || !isHexString(block)) reject('block' + err.nonHex)
+    if (!isHexString(block)) reject('block' + err.hex)
     else drpc(this, 'submitblock', [block], resolve, reject)
   })
 }
 
-function drpc (that, method, params, resolve, reject) {
-  request(that.protocol, that.host, that.daemonRpcPort, buildRpc(method, params), '/json_rpc', resolve, reject)
-}
-
 // Daemon RPC - JSON handlers
+
+function hrpc (that, params, path, resolve, reject) {
+  request(that.protocol, that.host, that.daemonRpcPort, JSON.stringify(params), path, resolve, reject)
+}
 
 CCX.prototype.info = function () {
   return new Promise((resolve, reject) => {
@@ -219,10 +256,9 @@ CCX.prototype.index = function () {
 
 CCX.prototype.startMining = function (opts) {
   return new Promise((resolve, reject) => {
-    if (typeof opts !== 'object') reject(err.opts)
-    else if (!opts.address || !opts.threads) reject('address and threads are required')
-    else if (typeof opts.address != 'string' || opts.address.length !== 98 || opts.address.slice(0, 3) != 'ccx') reject('address' + err.addr)
-    else if(!isNonNegative(opts.threads)) reject('unlockHeight' + err.nonNeg)
+    if (!isObject(opts)) reject(err.opts)
+    else if (!isAddress(opts.address)) reject('address' + err.addr)
+    else if (!isNonNegative(opts.threads)) reject('unlockHeight' + err.nonNeg)
     else hrpc(this, { miner_address: opts.address, threads_count: opts.threads }, '/start_mining', resolve, reject)
   })
 }
@@ -235,32 +271,37 @@ CCX.prototype.stopMining = function () {
 
 CCX.prototype.transactions = function (txs) {
   return new Promise((resolve, reject) => {
-    if (!Array.isArray(txs)) reject('txs is required and must be an array of transactions')
-    else {
-      let i
-      for (i = 0; i < txs.length; i++) { if (!isHex64String(txs[i])) break; }
-      if (i < txs.length) reject('each transaction' + err.hex64)
-      else hrpc(this, { txs_hashes: txs }, '/gettransactions', resolve, reject)
-    }
+    if (!arrayTest(txs, isHex64String)) reject('txs' + err.arr + ' of transactions which ' + err.hex64)
+    else hrpc(this, { txs_hashes: txs }, '/gettransactions', resolve, reject)
   })
 }
 
 CCX.prototype.sendRawTransaction = function (rawTx) {
   return new Promise((resolve, reject) => {
-    if (!rawTx || !isHexString(rawTx)) reject('rawTx' + err.nonHex)
+    if (!isHexString(rawTx)) reject('rawTx' + err.hex)
     else hrpc(this, { tx_as_hex: rawTx }, '/sendrawtransaction', resolve, reject)
   })
 }
 
-function hrpc (that, params, path, resolve, reject) {
-  request(that.protocol, that.host, that.daemonRpcPort, JSON.stringify(params), path, resolve, reject)
+// Utilities
+
+function arrayTest(arr, test) {
+  if (!Array.isArray(arr)) return false
+  let i
+  for (i = 0; i < arr.length; i++) { if (!test(arr[i])) break; }
+  if (i < arr.length) return false
+  return true
 }
 
-// Utilities
+function isObject (obj) { return typeof obj === 'object' }
+
+function isUndefined (obj) { return typeof obj === 'undefined' }
 
 function isNonNegative (n) { return (Number.isInteger(n) && n >= 0) }
 
 function isNumeric (n) { return !isNaN(parseFloat(n)) && isFinite(n) }
+
+function isAddress (str) { return (typeof str === 'string' &&  str.length === 98 && str.slice(0, 3) === 'ccx') }
 
 function isHex64String (str) { return (typeof str === 'string' && /[0-9a-fA-F]{64}/.test(str)) }
 
