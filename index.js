@@ -130,7 +130,7 @@ CCX.prototype.getTransactions = function (opts) {
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
     else if (!isNonNegative(opts.blockCount)) reject('blockCount' + err.nonNeg)
-    else if (!isUndefined(opts.firstBlockIndex) && !isUndefined(opts.blockHash)) reject('either firstBlockIndex or blockHash is required')
+    else if (isUndefined(opts.firstBlockIndex) && isUndefined(opts.blockHash)) reject('either firstBlockIndex or blockHash is required')
     else if (!isUndefined(opts.firstBlockIndex) && !isNonNegative(opts.firstBlockIndex)) reject('firstBlockIndex' + err.nonNeg)
     else if (!isUndefined(opts.blockHash) && !isHex64String(opts.blockHash)) reject('blockHash' + err.hex64)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
@@ -303,7 +303,7 @@ function isNumeric (n) { return !isNaN(parseFloat(n)) && isFinite(n) }
 
 function isAddress (str) { return (typeof str === 'string' &&  str.length === 98 && str.slice(0, 3) === 'ccx') }
 
-function isHex64String (str) { return (typeof str === 'string' && /[0-9a-fA-F]{64}/.test(str)) }
+function isHex64String (str) { return (typeof str === 'string' && /^[0-9a-fA-F]{64}$/.test(str)) }
 
 function isHexString (str) { return (typeof str === 'string' && !/[^0-9a-fA-F]/.test(str)) }
 
