@@ -60,6 +60,8 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Store wallet](#store)
     * [Send payment with memo](#send)
   * walletd (forthcoming)
+    * [Get status](#status)
+    * [Get transactions](#getTransactions)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
@@ -125,6 +127,21 @@ const opts = {
   memo: MEMO, // message to be encrypted (string, optional), e.g., ex: 'tip'
   paymentId: PAYMENT_ID, // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
   unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (integer, optional), ex: 12750
+}
+ccx.send(opts)
+```
+#### <a name="status">Get status (walletd)
+```
+ccx.status()
+```
+#### <a name="getTransactions">Get transactions (walletd)
+```
+const opts = { // either blockHash or firstBlockIndex is required
+  blockHash: BLOCK_HASH, // hash of first block (64-digit hexadecimal string, see comment above), ex: '0ab1...3f4b'
+  firstBlockIndex: FIRST_BLOCK_INDEX, // index of first block (non-negative integer, see comment above), ex: 12750
+  blockCount: BLOCK_COUNT, // number of blocks to include (non-negative integer, required), ex: 30
+  addresses: [ADDRESS, ...], filter (array of address strings, optional), ex: ['ccx7Xd...']
+  paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
 }
 ccx.send(opts)
 ```
