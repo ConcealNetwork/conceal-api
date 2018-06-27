@@ -49,7 +49,7 @@ const ccx = new CCX(host, walletRpcPort, daemonRpcPort)
 ```
 ccx.rpc returns a promise, where *rpc* is any of the methods below:
 
-* [Wallet RPC](#wallet)
+* [Wallet RPC (must provide walletRpcPort)](#wallet)
   * concealwallet
     * [Get height](#height)
     * [Get balance](#balance)
@@ -60,7 +60,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Store wallet](#store)
     * [Send payment with memo](#send)
   * walletd (forthcoming)
-* [Daemon RPC](#daemon)
+* [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
   * [Get count](#count)
