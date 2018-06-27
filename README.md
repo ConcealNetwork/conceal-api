@@ -1,20 +1,36 @@
 # conceal-js
-Javascript/Node.js interface to Conceal cryptocurrency RPC/API. Currenty only the wallet RPC is available.
+Javascript/Node.js interface to Conceal cryptocurrency RPC/API.
 
+There are are three RPC servers that are built in to these three programs:
+### conceald
+A node on the P2P network (daemon) with no wallet functions; console interactive. To launch:
+```
+$ ./conceald
+```
+The default RPC port is 16000 and the default P2P port is 15000.
+### walletd
+A node on the P2P network (optional daemon) plus wallet functions; console non-interactive. To launch, assuming that your wallet.bin.wallet file is in the current directory:
+```
+$ ./walletd --container-file wallet.bin.wallet --container-password PASSWD --local --p2p-bind-port 15000 --daemon-port 16000 --bind-port 3333
+```
+The wallet functions RPC port is 3333. The daemon RPC port is 16000 and the daemon P2P port is 15000. The `--local` option activates the daemon; otherwise, a remote daemon can be used.
+### concealwallet
+A simple wallet; console interactive unless RPC server is running; requires access to a node daemon for full functionality. To launch, assuming that your wallet.bin.wallet file is in the current directory:
+```
+$ ./concealwallet --rpc-bind-port 3333 --wallet-file wallet.bin --password PASSWORD
+```
+The wallet functions RPC port is 3333. By default the wallet connects with the daemon on port 16000.
 ## Quick start for node.js
 ```
 $ npm install conceal-js
-```
-Assuming that the Conceal daemon and wallet are installed and that your encrypted wallet.bin file is in the current directory,
-```
-$ conceald # start the network daemon
-$ concealwallet --rpc-bind-port PORT --wallet-file wallet.bin --password PASSWORD # start the wallet
+$ ./conceald # launch the network daemon
+$ ./concealwallet --rpc-bind-port PORT --wallet-file wallet.bin --password PASSWORD # launch the simple wallet
 ```
 Create and run a test program.
 ```
 $ node test.js
 ```
-The test program could contain, for example, a simple payment
+The test program could contain, for example, a simple payment via the simple wallet's RPC server
 ```
 const CCX = require('conceal-js')
 const ccx = new CCX('http://localhost', '3333')
@@ -34,14 +50,16 @@ const ccx = new CCX(host, walletRpcPort, daemonRpcPort)
 ccx.rpc returns a promise, where *rpc* is any of the methods below:
 
 * [Wallet RPC](#wallet)
-  * [Get height](#height)
-  * [Get balance](#balance)
-  * [Get messages](#messages)
-  * [Get incoming payments](#payments)
-  * [Get transfers](#transfers)
-  * [Reset wallet](#reset)
-  * [Store wallet](#store)
-  * [Send payment with memo](#send)
+  * concealwallet
+    * [Get height](#height)
+    * [Get balance](#balance)
+    * [Get messages](#messages)
+    * [Get incoming payments](#payments)
+    * [Get transfers](#transfers)
+    * [Reset wallet](#reset)
+    * [Store wallet](#store)
+    * [Send payment with memo](#send)
+  * walletd (forthcoming)
 * [Daemon RPC](#daemon)
   * [Get info](#info)
   * [Get index](#index)
@@ -64,15 +82,15 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
 
 ### <a name="wallet"></a>Wallet RPC (must provide walletRpcPort)
 
-#### <a name="height"></a>Get height
+#### <a name="height"></a>Get height (concealwallet)
 ```
 ccx.height() // get last block height
 ```
-#### <a name="balance">Get balance
+#### <a name="balance">Get balance (concealwallet)
 ```
 ccx.balance // get wallet balances
 ```
-#### <a name="messages">Get messages
+#### <a name="messages">Get messages (concealwallet)
 ```
 const opts = {
   firstTxId: FIRST_TX_ID, // (integer, optional), ex: 10
@@ -80,24 +98,24 @@ const opts = {
 }
 ccx.messages(opts) // opts can be omitted
 ```
-#### <a name="payments">Get incoming payments
+#### <a name="payments">Get incoming payments (concealwallet)
 ```
 const paymentId = PAYMENT_ID, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.payments(paymentId)
 ```
-#### <a name="transfers">Get transfers
+#### <a name="transfers">Get transfers (concealwallet)
 ```
 ccx.transfers() // gets all transfers (transactions)
 ```
-#### <a name="reset">Reset wallet
+#### <a name="reset">Reset wallet (concealwallet)
 ```
 ccx.reset() // discard wallet cache and resync with block chain
 ```
-#### <a name="store">Store wallet
+#### <a name="store">Store wallet (concealwallet)
 ```
 ccx.store() // save wallet cache to disk
 ```
-#### <a name="send">Send payment with memo
+#### <a name="send">Send payment with memo (concealwallet)
 ```
 const opts = {
   address: ADDRESS, // destination address (string, required), ex: 'ccx7Xd...'
