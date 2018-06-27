@@ -13,7 +13,7 @@ A node on the P2P network (optional daemon) plus wallet functions; console non-i
 ```
 $ ./walletd --container-file wallet.bin.wallet --container-password PASSWD --local --p2p-bind-port 15000 --daemon-port 16000 --bind-port 3333
 ```
-The wallet functions RPC port is 3333. The daemon RPC port is 16000 and the daemon P2P port is 15000. The `--local` option activates the daemon; otherwise, a remote daemon can be used.
+The wallet functions RPC port is 3333. The daemon P2P port is 15000. The `--local` option activates the daemon; otherwise, a remote daemon can be used. The daemon RPC port must be set but the built-in daemon RPC server is disabled.
 ### concealwallet
 A simple wallet; console interactive unless RPC server is running; requires access to a node daemon for full functionality. To launch, assuming that your wallet.bin.wallet file is in the current directory:
 ```
