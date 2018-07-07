@@ -58,10 +58,11 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get transfers](#transfers)
     * [Reset wallet](#reset)
     * [Store wallet](#store)
-    * [Send payment with memo](#send)
+    * [Send transfers with memos](#send)
   * walletd (forthcoming)
     * [Get status](#status)
     * [Get transactions](#getTransactions)
+    * [Send transactions without memos](#sendTransactions)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
@@ -90,7 +91,7 @@ ccx.height() // get last block height
 ```
 #### <a name="balance">Get balance (concealwallet)
 ```
-ccx.balance // get wallet balances
+ccx.balance() // get wallet balances
 ```
 #### <a name="messages">Get messages (concealwallet)
 ```
@@ -117,14 +118,14 @@ ccx.reset() // discard wallet cache and resync with block chain
 ```
 ccx.store() // save wallet cache to disk
 ```
-#### <a name="send">Send payment with memo (concealwallet)
+#### <a name="send">Send transfers with memos (concealwallet)
 ```
+const memo = MEMO, // message to be encrypted (string, optional), e.g., ex: 'refund'
+const transfers = [{ address: ADDRESS, amount: AMOUNT, memo: memo }, ...] // ADDRESS = destination address string (required), AMOUNT = raw CCX integer (required)
 const opts = {
-  address: ADDRESS, // destination address (string, required), ex: 'ccx7Xd...'
-  amount: AMOUNT, // payment amount (number, required, decimal), ex: 1.23
-  fee: FEE, // (number, optional, default is minimum required), ex: 0.000010
+  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, memo: 'refund' }]
+  fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
   mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 0
-  memo: MEMO, // message to be encrypted (string, optional), e.g., ex: 'tip'
   paymentId: PAYMENT_ID, // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
   unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (integer, optional), ex: 12750
 }
@@ -143,7 +144,7 @@ const opts = { // either blockHash or firstBlockIndex is required
   addresses: [ADDRESS, ...], filter (array of address strings, optional), ex: ['ccx7Xd...']
   paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
 }
-ccx.send(opts)
+ccx.getTransactions(opts)
 ```
 ### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 

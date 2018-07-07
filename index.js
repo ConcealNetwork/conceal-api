@@ -3,13 +3,20 @@ module.exports = CCX
 const http = require('http')
 const https = require('https')
 
+const MAX_MIXIN = 10
+const DEFAULT_MIXIN = 2
+const DEFAULT_UNLOCK_TIME = 0
+const DEFAULT_FEE = 10 // raw X
+const DEFAULT_MEMO_CHARACTER_FEE = 10 // raw X
+
 const err = {
   nonNeg: ' must be a non-negative integer',
   hex: ' must be a hexadecimal string',
   opts: 'opts must be object',
   hex64: ' must be 64-digit hexadecimal string',
-  dec: ' must be decimal amount of CCX',
   addr: ' must be 98-character string beginning with ccx',
+  raw: ' must be a raw amount of CCX (X)',
+  trans: ' must be a transfer object { address: 98-character string beginning with ccx, amount: raw amount of CCX (X) }',
   arr:  ' must be an array',
   str: ' must be a string'
 }
@@ -45,7 +52,7 @@ CCX.prototype.balance = function () {
 
 CCX.prototype.messages = function (opts) {
   return new Promise((resolve, reject) => {
-    if (!isObject(opts)) reject(err.opts)
+    if (!isObject(opts)) opts = {}
     else if (!isUndefined(opts.firstTxId) && !isNonNegative(opts.firstTxId)) reject('firstTxId' + err.nonNeg)
     else if (!isUndefined(opts.txLimit) && !isNonNegative(opts.txLimit)) reject('txLimit' + err.nonNeg)
     else {
@@ -83,32 +90,21 @@ CCX.prototype.reset = function () {
 }
 
 CCX.prototype.send = function (opts) {
-  const MAX_MIXIN = 10
-  const DEFAULT_MIXIN = 2
-  const DEFAULT_UNLOCK_TIME = 0
-  const DEFAULT_FEE = 0.00001
-  const DEFAULT_MEMO_CHARACTER_FEE = 0.00001
-
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
-    else if (typeof opts !== 'object') reject(err.opts)
-    else if (!isAddress(opts.address)) reject('address' + err.addr)
-    else if (!isNumeric(opts.amount)) reject('amount' + err.dec)
+    else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers which' + err.trans)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
-    else if (!isUndefined(opts.memo) && (typeof opts.memo !== 'string')) reject('memo' + err.str)
     else {
       if (isUndefined(opts.mixIn)) opts.mixIn = DEFAULT_MIXIN
-      if(!(opts.mixIn >= 0 && opts.mixIn <= MAX_MIXIN)) reject('0 <= mixIn <= 10')
+      if(!(opts.mixIn >= 0 && opts.mixIn <= MAX_MIXIN)) reject('0 <= mixIn <= ' + MAX_MIXIN)
       else {
         if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_TIME
         if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
         else {
           if (isUndefined(opts.fee)) opts.fee = DEFAULT_FEE + (!isUndefined(opts.memo) ? opts.memo.length * DEFAULT_MEMO_CHARACTER_FEE : 0)
-          if (!isNumeric(opts.fee)) reject('fee' + err.dec)
+          if (!isNonNegative(opts.fee)) reject('fee' + err.raw)
           else {
-            const d = { address: opts.address, amount: CCXToRaw(opts.amount) }
-            if (opts.memo) d.message = opts.memo
-            const obj = { destinations: [d], mixin: opts.mixIn, fee: CCXToRaw(opts.fee), unlock_time: opts.unlockHeight }
+            const obj = { destinations: opts.transfers, mixin: opts.mixIn, fee: opts.fee, unlock_time: opts.unlockHeight }
             if (opts.paymentId) obj.payment_id = opts.paymentId
             wrpc(this, 'transfer', obj, resolve, reject)
           }
@@ -122,7 +118,7 @@ CCX.prototype.send = function (opts) {
 
 CCX.prototype.status = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'getBalance', { }, resolve, reject)
+    wrpc(this, 'getStatus', { }, resolve, reject)
   })
 }
 
@@ -297,6 +293,8 @@ function isObject (obj) { return typeof obj === 'object' }
 
 function isUndefined (obj) { return typeof obj === 'undefined' }
 
+function isTransfer (obj) { return isObject(obj) && !isUndefined(obj.address) && isAddress(obj.address) && !isUndefined(obj.amount) && isNonNegative(obj.amount) }
+
 function isNonNegative (n) { return (Number.isInteger(n) && n >= 0) }
 
 function isNumeric (n) { return !isNaN(parseFloat(n)) && isFinite(n) }
@@ -330,7 +328,7 @@ function request (protocol, host, port, post, path, resolve, reject) {
       res.on('end', () => {
         try {
           data = JSON.parse(data.toString())
-          if (data.error) { reject(data.error.message) }
+          if (data.error) { reject(data.error.message); return }
         } catch (error) { reject(error.message); return }
         if (data.result) data = data.result
         resolve(data)
