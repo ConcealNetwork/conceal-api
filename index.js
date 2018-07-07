@@ -7,7 +7,7 @@ const MAX_MIXIN = 10
 const DEFAULT_MIXIN = 2
 const DEFAULT_UNLOCK_TIME = 0
 const DEFAULT_FEE = 10 // raw X
-const DEFAULT_MEMO_CHARACTER_FEE = 0 // raw X
+const DEFAULT_MEMO_CHARACTER_FEE = 10 // raw X
 
 const err = {
   nonNeg: ' must be a non-negative integer',
