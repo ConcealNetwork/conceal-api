@@ -7,7 +7,7 @@ const MAX_MIXIN = 10
 const DEFAULT_MIXIN = 2
 const DEFAULT_UNLOCK_TIME = 0
 const DEFAULT_FEE = 10 // raw X
-const DEFAULT_MEMO_CHARACTER_FEE = 10 // raw X
+const DEFAULT_MEMO_CHARACTER_FEE = 0 // raw X
 
 const err = {
   nonNeg: ' must be a non-negative integer',
@@ -16,7 +16,7 @@ const err = {
   hex64: ' must be 64-digit hexadecimal string',
   addr: ' must be 98-character string beginning with ccx',
   raw: ' must be a raw amount of CCX (X)',
-  trans: ' must be a transfer object { address: 98-character string beginning with ccx, amount: raw amount of CCX (X) }',
+  trans: ' must be a transfer object { address: 98-character string beginning with ccx, amount: raw amount of CCX (X), message: optional string }',
   arr:  ' must be an array',
   str: ' must be a string'
 }
@@ -92,7 +92,7 @@ CCX.prototype.reset = function () {
 CCX.prototype.send = function (opts) {
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
-    else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers which' + err.trans)
+    else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers each of which' + err.trans)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
     else {
       if (isUndefined(opts.mixIn)) opts.mixIn = DEFAULT_MIXIN
@@ -135,7 +135,7 @@ CCX.prototype.getTransactions = function (opts) {
     else if (!isUndefined(opts.firstBlockIndex) && !isNonNegative(opts.firstBlockIndex)) reject('firstBlockIndex' + err.nonNeg)
     else if (!isUndefined(opts.blockHash) && !isHex64String(opts.blockHash)) reject('blockHash' + err.hex64)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
-    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses which' + err.addr)
+    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
     else {
       const obj = {
         blockHash: opts.blockHash,
@@ -152,8 +152,8 @@ CCX.prototype.getTransactions = function (opts) {
 CCX.prototype.sendTransactions = function (opts) { // add messages later
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
-    else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers which' + err.trans)
-    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses which' + err.addr)
+    else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers each of which' + err.trans)
+    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
     else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
     else {
@@ -301,7 +301,7 @@ CCX.prototype.stopMining = function () {
 
 CCX.prototype.transactions = function (txs) {
   return new Promise((resolve, reject) => {
-    if (!arrayTest(txs, isHex64String)) reject('txs' + err.arr + ' of transactions which ' + err.hex64)
+    if (!arrayTest(txs, isHex64String)) reject('txs' + err.arr + ' of transactions each of which ' + err.hex64)
     else hrpc(this, { txs_hashes: txs }, '/gettransactions', resolve, reject)
   })
 }
@@ -327,7 +327,11 @@ function isObject (obj) { return typeof obj === 'object' }
 
 function isUndefined (obj) { return typeof obj === 'undefined' }
 
-function isTransfer (obj) { return isObject(obj) && !isUndefined(obj.address) && isAddress(obj.address) && !isUndefined(obj.amount) && isNonNegative(obj.amount) }
+function isTransfer (obj) {
+  if (!isObject(obj) || isUndefined(obj.address) || !isAddress(obj.address) || isUndefined(obj.amount) && !isNonNegative(obj.amount)) return false
+  if (typeof obj.message !== 'string') return false
+  return true
+}
 
 function isNonNegative (n) { return (Number.isInteger(n) && n >= 0) }
 
