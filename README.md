@@ -35,10 +35,10 @@ The test program could contain, for example, a simple payment via the simple wal
 const CCX = require('conceal-js')
 const ccx = new CCX('http://localhost', '3333')
 
-ccx.send({
+ccx.send([{
   address: 'ccx7Xd3NBbBiQNvv7vMLXmGMHyS8AVB6EhWoHo5EbGfR2Ki9pQnRTfEBt3YxYEVqpUCyJgvPjBYHp8N2yZwA7dqb4PjaGWuvs4',
   amount: 1.23
-})
+}])
 .then((res) => { console.log(res) }) // display tx hash upon success
 .catch((err) => { console.log(err) }) // display error message upon failure
 ```
