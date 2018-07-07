@@ -149,7 +149,7 @@ CCX.prototype.getTransactions = function (opts) {
   })
 }
 
-CCX.prototype.sendTransactions = function (opts) { // add memo later
+CCX.prototype.sendTransactions = function (opts) { // add messages later
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
     else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers which' + err.trans)
@@ -163,12 +163,7 @@ CCX.prototype.sendTransactions = function (opts) { // add memo later
         if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_TIME
         if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
         else {
-          if (isUndefined(opts.fee)) {
-            opts.fee = DEFAULT_FEE * opts.transfers.length
-            opts.transfers.forEach((transfer) => {
-              opts.fee += (!isUndefined(transfer.message) ? transfer.message.length * DEFAULT_MEMO_CHARACTER_FEE : 0)
-            })
-          }
+          if (isUndefined(opts.fee)) opts.fee = DEFAULT_FEE * opts.transfers.length
           if (!isNonNegative(opts.fee)) reject('fee' + err.raw)
           else {
             const obj = { transfers: opts.transfers, anonymity: opts.mixIn, fee: opts.fee, unlockTime: opts.unlockHeight }
