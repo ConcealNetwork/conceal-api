@@ -127,6 +127,13 @@ CCX.prototype.status = function () {
   })
 }
 
+CCX.prototype.getTransaction = function (hash) {
+  return new Promise((resolve, reject) => {
+    if (!isHex64String(hash)) reject('hash' + err.hex64)
+    else wrpc(this, 'getTransaction', { transactionHash: hash }, resolve, reject)
+  })
+}
+
 CCX.prototype.getTransactions = function (opts) {
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
@@ -149,13 +156,15 @@ CCX.prototype.getTransactions = function (opts) {
   })
 }
 
-CCX.prototype.sendTransactions = function (opts) { // add messages later
+CCX.prototype.sendTransactions = function (opts) {
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
     else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers each of which' + err.trans)
     else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
     else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
+    else if (!isUndefined(opts.extra) && typeof opts.extra !== 'string') reject ('extra' + err.str)
+
     else {
       if (isUndefined(opts.mixIn)) opts.mixIn = DEFAULT_MIXIN
       if(!(opts.mixIn >= 0 && opts.mixIn <= MAX_MIXIN)) reject('0 <= mixIn <= ' + MAX_MIXIN)
@@ -328,8 +337,8 @@ function isObject (obj) { return typeof obj === 'object' }
 function isUndefined (obj) { return typeof obj === 'undefined' }
 
 function isTransfer (obj) {
-  if (!isObject(obj) || isUndefined(obj.address) || !isAddress(obj.address) || isUndefined(obj.amount) && !isNonNegative(obj.amount)) return false
-  if (typeof obj.message !== 'string') return false
+  if (!isObject(obj) || isUndefined(obj.address) || !isAddress(obj.address) || isUndefined(obj.amount) || !isNonNegative(obj.amount)) return false
+  if (typeof obj.message !== 'undefined' && typeof obj.message !== 'string') return false
   return true
 }
 
@@ -342,8 +351,6 @@ function isAddress (str) { return (typeof str === 'string' &&  str.length === 98
 function isHex64String (str) { return (typeof str === 'string' && /^[0-9a-fA-F]{64}$/.test(str)) }
 
 function isHexString (str) { return (typeof str === 'string' && !/[^0-9a-fA-F]/.test(str)) }
-
-function CCXToRaw (ccx) { return Math.round(1000000 * parseFloat(ccx)) }
 
 function buildRpc (method, params) { return '{"jsonrpc":"2.0","id":"0","method":"' + method + '","params":'+ JSON.stringify(params) + '}' }
 

@@ -135,6 +135,11 @@ ccx.send(opts)
 ```
 ccx.status()
 ```
+#### <a name="getTransaction">Get Transaction
+```
+const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
+ccx.getTransaction(hash) // get transaction details given hash
+```
 #### <a name="getTransactions">Get transactions (walletd)
 ```
 const opts = { // either blockHash or firstBlockIndex is required
@@ -157,7 +162,8 @@ const opts = {
   paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
   mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 0
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
-  unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (non-negative integer, optional), ex: 12750
+  unlockHeight: UNLOCK_HEIGHT, // block height to unlock payment (non-negative integer, optional), ex: 12750
+  extra: EXTRA, // (variable length string, optional), ex: '123abc'
 }
 ccx.sendTransactions(opts)
 ```
