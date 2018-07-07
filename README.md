@@ -62,7 +62,6 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
   * walletd (forthcoming)
     * [Get status](#status)
     * [Get transactions](#getTransactions)
-    * [Send transactions without memos](#sendTransactions)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
