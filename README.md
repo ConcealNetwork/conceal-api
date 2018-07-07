@@ -58,7 +58,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get transfers](#transfers)
     * [Reset wallet](#reset)
     * [Store wallet](#store)
-    * [Send transfers with memos](#send)
+    * [Send transfers with messages](#send)
   * walletd (forthcoming)
     * [Get status](#status)
     * [Get transactions](#getTransactions)
@@ -117,12 +117,12 @@ ccx.reset() // discard wallet cache and resync with block chain
 ```
 ccx.store() // save wallet cache to disk
 ```
-#### <a name="send">Send transfers with memos (concealwallet)
+#### <a name="send">Send transfers with messages (concealwallet)
 ```
-const memo = MEMO, // message to be encrypted (string, optional), e.g., ex: 'refund'
-const transfers = [{ address: ADDRESS, amount: AMOUNT, memo: memo }, ...] // ADDRESS = destination address string (required), AMOUNT = raw CCX integer (required)
+const message = MESSAGE, // message to be encrypted (string, optional), e.g., ex: 'refund'
+const transfers = [{ address: ADDRESS, amount: AMOUNT, message: message }, ...] // ADDRESS = destination address string (required), AMOUNT = raw CCX integer (required)
 const opts = {
-  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, memo: 'refund' }]
+  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, message: 'refund' }]
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
   mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 0
   paymentId: PAYMENT_ID, // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
@@ -144,6 +144,7 @@ const opts = { // either blockHash or firstBlockIndex is required
   paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
 }
 ccx.getTransactions(opts)
+```
 ```
 ### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 

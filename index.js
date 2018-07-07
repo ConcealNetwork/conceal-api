@@ -101,7 +101,12 @@ CCX.prototype.send = function (opts) {
         if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_TIME
         if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
         else {
-          if (isUndefined(opts.fee)) opts.fee = DEFAULT_FEE + (!isUndefined(opts.memo) ? opts.memo.length * DEFAULT_MEMO_CHARACTER_FEE : 0)
+          if (isUndefined(opts.fee)) {
+            opts.fee = DEFAULT_FEE * opts.transfers.length
+            opts.transfers.forEach((transfer) => {
+              opts.fee += (!isUndefined(transfer.message) ? transfer.message.length * DEFAULT_MEMO_CHARACTER_FEE : 0)
+            })
+          }
           if (!isNonNegative(opts.fee)) reject('fee' + err.raw)
           else {
             const obj = { destinations: opts.transfers, mixin: opts.mixIn, fee: opts.fee, unlock_time: opts.unlockHeight }
