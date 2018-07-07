@@ -62,6 +62,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
   * walletd (forthcoming)
     * [Get status](#status)
     * [Get transactions](#getTransactions)
+    * [Send transactions without messages](#sendTransactions)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
@@ -145,6 +146,20 @@ const opts = { // either blockHash or firstBlockIndex is required
 }
 ccx.getTransactions(opts)
 ```
+#### <a name="sendTransactions">Send transactions without messages (walletd)
+```
+const transfers = [{ address: ADDRESS, amount: AMOUNT }, ...] // ADDRESS = destination address string (required), AMOUNT = raw CCX integer (required)
+const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = source address string; address in wallet to take funds from
+const opts = {
+  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000 }]
+  addresses: addresses, // (array, optional), ex: ['ccx7Xd...', 'ccx7Xe...']
+  changeAddress: ADDRESS, // change return address (address string, optional if only one address in wallet or only one source address given), ex: 'ccx7Xd...'
+  paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
+  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 0
+  fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
+  unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (non-negative integer, optional), ex: 12750
+}
+ccx.sendTransactions(opts)
 ```
 ### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 

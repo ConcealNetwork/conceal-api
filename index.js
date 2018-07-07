@@ -149,6 +149,40 @@ CCX.prototype.getTransactions = function (opts) {
   })
 }
 
+CCX.prototype.sendTransactions = function (opts) { // add memo later
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts)
+    else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers which' + err.trans)
+    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses which' + err.addr)
+    else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
+    else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
+    else {
+      if (isUndefined(opts.mixIn)) opts.mixIn = DEFAULT_MIXIN
+      if(!(opts.mixIn >= 0 && opts.mixIn <= MAX_MIXIN)) reject('0 <= mixIn <= ' + MAX_MIXIN)
+      else {
+        if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_TIME
+        if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
+        else {
+          if (isUndefined(opts.fee)) {
+            opts.fee = DEFAULT_FEE * opts.transfers.length
+            opts.transfers.forEach((transfer) => {
+              opts.fee += (!isUndefined(transfer.message) ? transfer.message.length * DEFAULT_MEMO_CHARACTER_FEE : 0)
+            })
+          }
+          if (!isNonNegative(opts.fee)) reject('fee' + err.raw)
+          else {
+            const obj = { transfers: opts.transfers, anonymity: opts.mixIn, fee: opts.fee, unlockTime: opts.unlockHeight }
+            if (opts.addresses) obj.addresses = opts.addresses
+            if (opts.changeAddress) obj.changeAddress = opts.changeAddress
+            if (opts.paymentId) obj.paymentId = opts.paymentId
+            wrpc(this, 'sendTransaction', obj, resolve, reject)
+          }
+        }
+      }
+    }
+  })
+}
+
 // Daemon RPC - JSON RPC
 
 function drpc (that, method, params, resolve, reject) {
