@@ -122,7 +122,7 @@ ccx.store() // save wallet cache to disk
 #### <a name="send">Send transfers with messages (concealwallet)
 ```
 const message = MESSAGE, // message to be encrypted (string, optional), e.g., ex: 'refund'
-const transfers = [{ address: ADDRESS, amount: AMOUNT, message: message }, ...] // ADDRESS = destination address string (required), AMOUNT = raw CCX integer (required)
+const transfers = [{ address: ADDRESS, amount: AMOUNT, message: message }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required)
 const opts = {
   transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, message: 'refund' }]
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
@@ -154,7 +154,7 @@ ccx.getTransactions(opts)
 ```
 #### <a name="sendTransactions">Send transactions without messages (walletd)
 ```
-const transfers = [{ address: ADDRESS, amount: AMOUNT }, ...] // ADDRESS = destination address string (required), AMOUNT = raw CCX integer (required)
+const transfers = [{ address: ADDRESS, amount: AMOUNT }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required)
 const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = source address string; address in wallet to take funds from
 const opts = {
   transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000 }]

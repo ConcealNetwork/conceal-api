@@ -7,7 +7,7 @@ const MAX_MIXIN = 10
 const DEFAULT_MIXIN = 2
 const DEFAULT_UNLOCK_TIME = 0
 const DEFAULT_FEE = 10 // raw X
-const DEFAULT_MEMO_CHARACTER_FEE = 10 // raw X
+const DEFAULT_MEMO_CHARACTER_FEE = 0 // raw X
 
 const err = {
   nonNeg: ' must be a non-negative integer',
@@ -164,7 +164,6 @@ CCX.prototype.sendTransactions = function (opts) {
     else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
     else if (!isUndefined(opts.extra) && typeof opts.extra !== 'string') reject ('extra' + err.str)
-
     else {
       if (isUndefined(opts.mixIn)) opts.mixIn = DEFAULT_MIXIN
       if(!(opts.mixIn >= 0 && opts.mixIn <= MAX_MIXIN)) reject('0 <= mixIn <= ' + MAX_MIXIN)
