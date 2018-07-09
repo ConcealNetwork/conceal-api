@@ -61,6 +61,13 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Send transfers with messages](#send)
   * walletd (forthcoming)
     * [Get status](#status)
+    * [Reset or replace wallet](#resetOrReplace)
+    * [Create Address](#createAddress)
+    * [Delete Address](#deleteAddress)
+    * [Get Addresses](#getAddresses)
+    * [Get Balance](#getBalance)
+    * [Get view secret Key](#getViewSecretKey)
+    * [Get spend keys](#getViewSecretKey)
     * [Get transaction](#getTransaction)
     * [Get transactions](#getTransactions)
     * [Send transactions without messages](#sendTransactions)
@@ -131,12 +138,43 @@ const opts = {
   unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (integer, optional), ex: 12750
 }
 ccx.send(opts)
+#### <a name="resetOrReplace">Reset or replace wallet (walletd)
+```
+const viewSecretKey = VIEW_SECRET_KEY, // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
+ccx.resetOrReplace(viewSecretKey) // If no key, wallet is re-synced. If key, a new address is created from the key for a new wallet.
 ```
 #### <a name="status">Get status (walletd)
 ```
 ccx.status()
 ```
-#### <a name="getTransaction">Get Transaction
+#### <a name="createAddress">Create address (walletd)
+```
+ccx.createAddress()
+```
+#### <a name="deleteAddress">Delete address (walletd)
+```
+const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
+ccx.deleteAddress(address)
+```
+#### <a name="getAddresses">Get addresses (walletd)
+```
+ccx.getAddresses()
+```
+#### <a name="getBalance">Get balance (walletd)
+```
+const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
+ccx.getBalance(address)
+```
+#### <a name="getViewSecretKey">Get view secret Key (walletd)
+```
+ccx.getViewSecretKey()
+```
+#### <a name="getSpendKeys">Get spend keys (walletd)
+```
+const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
+ccx.getSpendKeys(address)
+```
+#### <a name="getTransaction">Get transaction
 ```
 const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.getTransaction(hash) // get transaction details given hash

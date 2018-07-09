@@ -7,7 +7,7 @@ const MAX_MIXIN = 10
 const DEFAULT_MIXIN = 2
 const DEFAULT_UNLOCK_TIME = 0
 const DEFAULT_FEE = 10 // raw X
-const DEFAULT_MEMO_CHARACTER_FEE = 0 // raw X
+const DEFAULT_MEMO_CHARACTER_FEE = 10 // raw X
 
 const err = {
   nonNeg: ' must be a non-negative integer',
@@ -121,9 +121,59 @@ CCX.prototype.send = function (opts) {
 
 // Wallet RPC -- walletd
 
+CCX.prototype.resetOrReplace = function (viewSecretKey) {
+  return new Promise((resolve, reject) => {
+    if (!isUndefined(viewSecretKey) && !isHex64String(viewSecretKey)) reject('viewSecretKey' + err.hex64)
+    else {
+      const obj = { }
+      if (viewSecretKey) obj.viewSecretKey = viewSecretKey
+      wrpc(this, 'reset', obj, resolve, reject)
+    }
+  })
+}
+
 CCX.prototype.status = function () {
   return new Promise((resolve, reject) => {
     wrpc(this, 'getStatus', { }, resolve, reject)
+  })
+}
+
+CCX.prototype.createAddress = function () {
+  return new Promise((resolve, reject) => {
+    wrpc(this, 'createAddress', { }, resolve, reject)
+  })
+}
+
+CCX.prototype.deleteAddress = function (address) {
+  return new Promise((resolve, reject) => {
+    if (isUndefined(address) || !isAddress(address)) reject('address' + err.addr)
+    wrpc(this, 'deleteAddress', { address: address }, resolve, reject)
+  })
+}
+
+CCX.prototype.getAddresses = function () {
+  return new Promise((resolve, reject) => {
+    wrpc(this, 'getAddresses', { }, resolve, reject)
+  })
+}
+
+CCX.prototype.getBalance = function (address) {
+  return new Promise((resolve, reject) => {
+    if (isUndefined(address) || !isAddress(address)) reject('address' + err.addr)
+    else wrpc(this, 'getBalance', { address: address }, resolve, reject)
+  })
+}
+
+CCX.prototype.getViewSecretKey = function () {
+  return new Promise((resolve, reject) => {
+    wrpc(this, 'getViewKey', { }, resolve, reject)
+  })
+}
+
+CCX.prototype.getSpendKeys = function (address) {
+  return new Promise((resolve, reject) => {
+    if (isUndefined(address) || !isAddress(address)) reject('address' + err.addr)
+    else wrpc(this, 'getSpendKeys', { address: address }, resolve, reject)
   })
 }
 
