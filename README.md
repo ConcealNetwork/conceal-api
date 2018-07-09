@@ -67,7 +67,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get addresses](#getAddresses)
     * [Get balance](#getBalance)
     * [Get view secret Key](#getViewSecretKey)
-    * [Get spend keys](#getViewSecretKey)
+    * [Get spend keys](#getSpendKeys)
     * [Get transaction](#getTransaction)
     * [Get transactions](#getTransactions)
     * [Send transactions without messages](#sendTransactions)
