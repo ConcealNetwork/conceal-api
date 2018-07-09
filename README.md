@@ -60,8 +60,8 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Store wallet](#store)
     * [Send transfers with messages](#send)
   * walletd (forthcoming)
-    * [Get status](#status)
     * [Reset or replace wallet](#resetOrReplace)
+    * [Get status](#status)
     * [Create Address](#createAddress)
     * [Delete Address](#deleteAddress)
     * [Get Addresses](#getAddresses)
@@ -137,6 +137,7 @@ const opts = {
   paymentId: PAYMENT_ID, // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
   unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (integer, optional), ex: 12750
 }
+```
 ccx.send(opts)
 #### <a name="resetOrReplace">Reset or replace wallet (walletd)
 ```
