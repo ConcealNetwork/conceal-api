@@ -181,7 +181,7 @@ ccx.getSpendKeys(address)
 #### <a name="getBlockHashes">Get block hashes (walletd)
 ```
 const firstBlockIndex = FIRST_BLOCK_INDEX // index of first block (non-negative integer, required), ex: 12750
-blockCount: BLOCK_COUNT, // number of blocks to include (non-negative integer, required), ex: 30
+const blockCount = BLOCK_COUNT // number of blocks to include (non-negative integer, required), ex: 30
 ccx.getBlockHashes(firstBlockIndex, blockCount)
 ```
 #### <a name="getTransaction">Get transaction
