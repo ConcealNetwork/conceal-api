@@ -68,7 +68,10 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get balance](#getBalance)
     * [Get view secret Key](#getViewSecretKey)
     * [Get spend keys](#getSpendKeys)
+    * [Get block hashes](#getBlockHashes)
     * [Get transaction](#getTransaction)
+    * [Get unconfirmed transactions](#getUnconfirmedTransactions)
+    * [Get transaction hashes](#getTransactionHashes)
     * [Get transactions](#getTransactions)
     * [Send transactions without messages](#sendTransactions)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
@@ -133,7 +136,7 @@ const transfers = [{ address: ADDRESS, amount: AMOUNT, message: message }, ...] 
 const opts = {
   transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, message: 'refund' }]
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
-  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 0
+  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
   paymentId: PAYMENT_ID, // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
   unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (integer, optional), ex: 12750
 }
@@ -175,10 +178,32 @@ ccx.getViewSecretKey()
 const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
 ccx.getSpendKeys(address)
 ```
+#### <a name="getBlockHashes">Get block hashes (walletd)
+```
+const firstBlockIndex = FIRST_BLOCK_INDEX // index of first block (non-negative integer, required), ex: 12750
+blockCount: BLOCK_COUNT, // number of blocks to include (non-negative integer, required), ex: 30
+ccx.getBlockHashes(firstBlockIndex, blockCount)
+```
 #### <a name="getTransaction">Get transaction
 ```
 const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.getTransaction(hash) // get transaction details given hash
+```
+#### <a name="getUnconfirmedTransactions">Get unconfirmed transactions
+```
+const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = address string; address to include
+ccx.getUnconfirmedTransactions(addresses) // addresses can be omitted
+```
+#### <a name="getTransactionHashes">Get transactionHashes (walletd)
+```
+const opts = { // either blockHash or firstBlockIndex is required
+  blockHash: BLOCK_HASH, // hash of first block (64-digit hexadecimal string, see comment above), ex: '0ab1...3f4b'
+  firstBlockIndex: FIRST_BLOCK_INDEX, // index of first block (non-negative integer, see comment above), ex: 12750
+  blockCount: BLOCK_COUNT, // number of blocks to include (non-negative integer, required), ex: 30
+  addresses: [ADDRESS, ...], filter (array of address strings, optional), ex: ['ccx7Xd...']
+  paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
+}
+ccx.getTransactionHashes(opts)
 ```
 #### <a name="getTransactions">Get transactions (walletd)
 ```
@@ -200,7 +225,7 @@ const opts = {
   addresses: addresses, // (array, optional), ex: ['ccx7Xd...', 'ccx7Xe...']
   changeAddress: ADDRESS, // change return address (address string, optional if only one address in wallet or only one source address given), ex: 'ccx7Xd...'
   paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
-  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 0
+  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
   unlockHeight: UNLOCK_HEIGHT, // block height to unlock payment (non-negative integer, optional), ex: 12750
   extra: EXTRA, // (variable length string, optional), ex: '123abc'

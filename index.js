@@ -4,8 +4,8 @@ const http = require('http')
 const https = require('https')
 
 const MAX_MIXIN = 10
-const DEFAULT_MIXIN = 2
-const DEFAULT_UNLOCK_TIME = 0
+const MIN_MIXIN = 2
+const DEFAULT_UNLOCK_HEIGHT = 0
 const DEFAULT_FEE = 10 // raw X
 const DEFAULT_MEMO_CHARACTER_FEE = 10 // raw X
 
@@ -95,10 +95,10 @@ CCX.prototype.send = function (opts) {
     else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers each of which' + err.trans)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
     else {
-      if (isUndefined(opts.mixIn)) opts.mixIn = DEFAULT_MIXIN
-      if(!(opts.mixIn >= 0 && opts.mixIn <= MAX_MIXIN)) reject('0 <= mixIn <= ' + MAX_MIXIN)
+      if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
+      if(!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
       else {
-        if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_TIME
+        if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_HEIGHT
         if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
         else {
           if (isUndefined(opts.fee)) {
@@ -177,10 +177,38 @@ CCX.prototype.getSpendKeys = function (address) {
   })
 }
 
+CCX.prototype.getBlockHashes = function (firstBlockIndex, blockCount) {
+  return new Promise((resolve, reject) => {
+    if (isUndefined(firstBlockIndex) || !isNonNegative(firstBlockIndex)) reject('firstBlockIndex' + err.nonNeg)
+    else if (isUndefined(blockCount) || !isNonNegative(blockCount)) reject('blockCount' + err.nonNeg)
+    else wrpc(this, 'getBlockHashes', { firstBlockIndex: firstBlockIndex, blockCount: blockCount }, resolve, reject)
+  })
+}
+
 CCX.prototype.getTransaction = function (hash) {
   return new Promise((resolve, reject) => {
     if (!isHex64String(hash)) reject('hash' + err.hex64)
     else wrpc(this, 'getTransaction', { transactionHash: hash }, resolve, reject)
+  })
+}
+
+CCX.prototype.getUnconfirmedTransactionHashes = function (addresses) {
+  return new Promise((resolve, reject) => {
+    if (!isUndefined(addresses) && !arrayTest(addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
+    else wrpc(this, 'getUnconfirmedTransactionHashes', { addresses: addresses }, resolve, reject)
+  })
+}
+
+CCX.prototype.getTransactionHashes = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts)
+    else if (!isNonNegative(opts.blockCount)) reject('blockCount' + err.nonNeg)
+    else if (isUndefined(opts.firstBlockIndex) && isUndefined(opts.blockHash)) reject('either firstBlockIndex or blockHash is required')
+    else if (!isUndefined(opts.firstBlockIndex) && !isNonNegative(opts.firstBlockIndex)) reject('firstBlockIndex' + err.nonNeg)
+    else if (!isUndefined(opts.blockHash) && !isHex64String(opts.blockHash)) reject('blockHash' + err.hex64)
+    else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
+    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
+    else wrpc(this, 'getTransactionHashes', opts, resolve, reject)
   })
 }
 
@@ -193,16 +221,7 @@ CCX.prototype.getTransactions = function (opts) {
     else if (!isUndefined(opts.blockHash) && !isHex64String(opts.blockHash)) reject('blockHash' + err.hex64)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
     else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
-    else {
-      const obj = {
-        blockHash: opts.blockHash,
-        firstBlockIndex: opts.firstBlockIndex,
-        blockCount: opts.blockCount,
-        addresses: opts.addresses,
-        paymentId: opts.paymentId
-      }
-      wrpc(this, 'getTransactions', obj, resolve, reject)
-    }
+    else wrpc(this, 'getTransactions', opts, resolve, reject)
   })
 }
 
@@ -215,21 +234,17 @@ CCX.prototype.sendTransactions = function (opts) {
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
     else if (!isUndefined(opts.extra) && typeof opts.extra !== 'string') reject ('extra' + err.str)
     else {
-      if (isUndefined(opts.mixIn)) opts.mixIn = DEFAULT_MIXIN
-      if(!(opts.mixIn >= 0 && opts.mixIn <= MAX_MIXIN)) reject('0 <= mixIn <= ' + MAX_MIXIN)
+      if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
+      if(!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
       else {
-        if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_TIME
+        opts.anonymity = opts.mixIn; delete opts.mixIn
+        if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_HEIGHT
         if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
         else {
+          opts.unlockTime = opts.unlockHeight; delete opts.unlockHeight
           if (isUndefined(opts.fee)) opts.fee = DEFAULT_FEE * opts.transfers.length
           if (!isNonNegative(opts.fee)) reject('fee' + err.raw)
-          else {
-            const obj = { transfers: opts.transfers, anonymity: opts.mixIn, fee: opts.fee, unlockTime: opts.unlockHeight }
-            if (opts.addresses) obj.addresses = opts.addresses
-            if (opts.changeAddress) obj.changeAddress = opts.changeAddress
-            if (opts.paymentId) obj.paymentId = opts.paymentId
-            wrpc(this, 'sendTransaction', obj, resolve, reject)
-          }
+          else wrpc(this, 'sendTransaction', opts, resolve, reject)
         }
       }
     }
