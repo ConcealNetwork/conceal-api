@@ -114,7 +114,7 @@ ccx.messages(opts) // opts can be omitted
 ```
 #### <a name="payments">Get incoming payments (concealwallet)
 ```
-const paymentId = PAYMENT_ID, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
+const paymentId = PAYMENT_ID // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.payments(paymentId)
 ```
 #### <a name="transfers">Get transfers (concealwallet)
@@ -131,7 +131,7 @@ ccx.store() // save wallet cache to disk
 ```
 #### <a name="send">Send transfers with messages (concealwallet)
 ```
-const message = MESSAGE, // message to be encrypted (string, optional), e.g., ex: 'refund'
+const message = MESSAGE // message to be encrypted (string, optional), e.g., ex: 'refund'
 const transfers = [{ address: ADDRESS, amount: AMOUNT, message: message }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required)
 const opts = {
   transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, message: 'refund' }]
@@ -144,7 +144,7 @@ const opts = {
 ccx.send(opts)
 #### <a name="resetOrReplace">Reset or replace wallet (walletd)
 ```
-const viewSecretKey = VIEW_SECRET_KEY, // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
+const viewSecretKey = VIEW_SECRET_KEY // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
 ccx.resetOrReplace(viewSecretKey) // If no key, wallet is re-synced. If key, a new address is created from the key for a new wallet.
 ```
 #### <a name="status">Get status (walletd)
@@ -186,7 +186,7 @@ ccx.getBlockHashes(firstBlockIndex, blockCount)
 ```
 #### <a name="getTransaction">Get transaction
 ```
-const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
+const hash = HASH // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.getTransaction(hash) // get transaction details given hash
 ```
 #### <a name="getUnconfirmedTransactions">Get unconfirmed transactions
@@ -201,7 +201,7 @@ const opts = { // either blockHash or firstBlockIndex is required
   firstBlockIndex: FIRST_BLOCK_INDEX, // index of first block (non-negative integer, see comment above), ex: 12750
   blockCount: BLOCK_COUNT, // number of blocks to include (non-negative integer, required), ex: 30
   addresses: [ADDRESS, ...], filter (array of address strings, optional), ex: ['ccx7Xd...']
-  paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
+  paymentId: PAYMENT_ID // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
 }
 ccx.getTransactionHashes(opts)
 ```
@@ -212,7 +212,7 @@ const opts = { // either blockHash or firstBlockIndex is required
   firstBlockIndex: FIRST_BLOCK_INDEX, // index of first block (non-negative integer, see comment above), ex: 12750
   blockCount: BLOCK_COUNT, // number of blocks to include (non-negative integer, required), ex: 30
   addresses: [ADDRESS, ...], filter (array of address strings, optional), ex: ['ccx7Xd...']
-  paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
+  paymentId: PAYMENT_ID // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
 }
 ccx.getTransactions(opts)
 ```
@@ -228,7 +228,7 @@ const opts = {
   mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
   unlockHeight: UNLOCK_HEIGHT, // block height to unlock payment (non-negative integer, optional), ex: 12750
-  extra: EXTRA, // (variable length string, optional), ex: '123abc'
+  extra: EXTRA // (variable length string, optional), ex: '123abc'
 }
 ccx.sendTransactions(opts)
 ```
@@ -252,17 +252,17 @@ ccx.currencyId()
 ```
 #### <a name="blockHashByHeight">Get block hash by height
 ```
-const height = HEIGHT, // (non-negative integer, required), ex: 12750
+const height = HEIGHT // (non-negative integer, required), ex: 12750
 ccx.blockHashByHeight(height) // get block hash given height
 ```
 #### <a name="blockHeaderByHeight">Get block header by height
 ```
-const height = HEIGHT, // (non-negative integer, required), ex: 12750
+const height = HEIGHT // (non-negative integer, required), ex: 12750
 ccx.blockHeaderByHeight(height) // get block header given height
 ```
 #### <a name="blockHeaderByHash">Get block header by hash
 ```
-const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
+const hash = HASH // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.blockHeaderByHash(hash) // get block header given hash
 ```
 #### <a name="lastBlockHeader">Get last block header
@@ -271,12 +271,12 @@ ccx.lastBlockHeader()
 ```
 #### <a name="block">Get block
 ```
-const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
+const hash = HASH // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.block(hash)
 ```
 #### <a name="blocks">Get blocks
 ```
-const height = HEIGHT, // (non-negative integer, required), ex: 12750
+const height = HEIGHT // (non-negative integer, required), ex: 12750
 ccx.blocks(height) // returns 31 blocks up to and including *height*
 ```
 #### <a name="blockTemplate">Get block template
@@ -296,7 +296,7 @@ ccx.submitBlock(block)
 ```
 #### <a name="transaction">Get transaction
 ```
-const hash = HASH, // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
+const hash = HASH // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.transaction(hash)
 ```
 #### <a name="transactions">Get transactions
