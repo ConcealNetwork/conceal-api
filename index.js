@@ -138,6 +138,13 @@ CCX.prototype.status = function () {
   })
 }
 
+CCX.prototype.getBalance = function (address) {
+  return new Promise((resolve, reject) => {
+    if (isUndefined(address) || !isAddress(address)) reject('address' + err.addr)
+    else wrpc(this, 'getBalance', { address: address }, resolve, reject)
+  })
+}
+
 CCX.prototype.createAddress = function () {
   return new Promise((resolve, reject) => {
     wrpc(this, 'createAddress', { }, resolve, reject)
@@ -154,13 +161,6 @@ CCX.prototype.deleteAddress = function (address) {
 CCX.prototype.getAddresses = function () {
   return new Promise((resolve, reject) => {
     wrpc(this, 'getAddresses', { }, resolve, reject)
-  })
-}
-
-CCX.prototype.getBalance = function (address) {
-  return new Promise((resolve, reject) => {
-    if (isUndefined(address) || !isAddress(address)) reject('address' + err.addr)
-    else wrpc(this, 'getBalance', { address: address }, resolve, reject)
   })
 }
 
@@ -225,7 +225,7 @@ CCX.prototype.getTransactions = function (opts) {
   })
 }
 
-CCX.prototype.sendTransactions = function (opts) {
+CCX.prototype.sendTransaction = function (opts) {
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
     else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers each of which' + err.trans)

@@ -1,7 +1,9 @@
 # conceal-js
 Javascript/Node.js interface to Conceal cryptocurrency RPC/API.
 
-There are are three RPC servers that are built in to these three programs:
+There are are three RPC servers that are built in to three programs *conceald*, *concealwallet* and *walletd*.
+They can each be started with the argument `--help` to display command line options.
+
 ### conceald
 A node on the P2P network (daemon) with no wallet functions; console interactive. To launch:
 ```
@@ -9,35 +11,35 @@ $ ./conceald
 ```
 The default RPC port is 16000 and the default P2P port is 15000.
 ### walletd
-A node on the P2P network (optional daemon) plus wallet functions; console non-interactive. To launch, assuming that your wallet.bin.wallet file is in the current directory:
+An optional node on the P2P network (daemon) with wallet functions; console non-interactive. To launch, assuming that your `my.wallet` file is in the current directory:
 ```
-$ ./walletd --container-file wallet.bin.wallet --container-password PASSWD --local --p2p-bind-port 15000 --daemon-port 16000 --bind-port 3333
+$ ./walletd --container-file my.wallet --container-password PASSWD --local --p2p-bind-port 15000 --daemon-port 16000 --bind-port 3333
 ```
 The wallet functions RPC port is 3333. The daemon P2P port is 15000. The `--local` option activates the daemon; otherwise, a remote daemon can be used. The daemon RPC port must be set but the built-in daemon RPC server is disabled.
 ### concealwallet
-A simple wallet; console interactive unless RPC server is running; requires access to a node daemon for full functionality. To launch, assuming that your wallet.bin.wallet file is in the current directory:
+A simple wallet; console interactive unless RPC server is running; requires access to a node daemon for full functionality. To launch, assuming that your `my.wallet` file is in the current directory:
 ```
-$ ./concealwallet --rpc-bind-port 3333 --wallet-file wallet.bin --password PASSWORD
+$ ./concealwallet --rpc-bind-port 3333 --wallet-file my --password PASSWORD
 ```
 The wallet functions RPC port is 3333. By default the wallet connects with the daemon on port 16000.
 ## Quick start for node.js
 ```
 $ npm install conceal-js
 $ ./conceald # launch the network daemon
-$ ./concealwallet --rpc-bind-port PORT --wallet-file wallet.bin --password PASSWORD # launch the simple wallet
+$ ./concealwallet --rpc-bind-port PORT --wallet-file my --password PASSWORD # launch the simple wallet
 ```
 Create and run a test program.
 ```
 $ node test.js
 ```
-The test program could contain, for example, a simple payment via the simple wallet's RPC server
+The test program could contain, for example, a payment via the simple wallet's RPC server
 ```
 const CCX = require('conceal-js')
 const ccx = new CCX('http://localhost', '3333')
 
 ccx.send([{
   address: 'ccx7Xd3NBbBiQNvv7vMLXmGMHyS8AVB6EhWoHo5EbGfR2Ki9pQnRTfEBt3YxYEVqpUCyJgvPjBYHp8N2yZwA7dqb4PjaGWuvs4',
-  amount: 1.23
+  amount: 1234567
 }])
 .then((res) => { console.log(res) }) // display tx hash upon success
 .catch((err) => { console.log(err) }) // display error message upon failure
@@ -59,13 +61,13 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Reset wallet](#reset)
     * [Store wallet](#store)
     * [Send transfers with messages](#send)
-  * walletd (forthcoming)
+  * walletd
     * [Reset or replace wallet](#resetOrReplace)
     * [Get status](#status)
+    * [Get balance](#getBalance)
     * [Create address](#createAddress)
     * [Delete address](#deleteAddress)
     * [Get addresses](#getAddresses)
-    * [Get balance](#getBalance)
     * [Get view secret Key](#getViewSecretKey)
     * [Get spend keys](#getSpendKeys)
     * [Get block hashes](#getBlockHashes)
@@ -73,7 +75,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get unconfirmed transactions](#getUnconfirmedTransactions)
     * [Get transaction hashes](#getTransactionHashes)
     * [Get transactions](#getTransactions)
-    * [Send transactions without messages](#sendTransactions)
+    * [Send transaction without messages](#sendTransaction)
     * [Create delayed transaction without messages](#createDelayedTransaction)
     * [Get delayed transaction hashes](#getDelayedTransactionHashes)
     * [Delete delayed transaction](#deleteDelayedTransaction)
@@ -123,7 +125,7 @@ ccx.payments(paymentId)
 ```
 #### <a name="transfers">Get transfers (concealwallet)
 ```
-ccx.transfers() // gets all transfers (transactions)
+ccx.transfers() // gets all transfers
 ```
 #### <a name="reset">Reset wallet (concealwallet)
 ```
@@ -144,8 +146,8 @@ const opts = {
   paymentId: PAYMENT_ID, // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
   unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (integer, optional), ex: 12750
 }
-```
 ccx.send(opts)
+```
 #### <a name="resetOrReplace">Reset or replace wallet (walletd)
 ```
 const viewSecretKey = VIEW_SECRET_KEY // (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
@@ -154,6 +156,11 @@ ccx.resetOrReplace(viewSecretKey) // If no key, wallet is re-synced. If key, a n
 #### <a name="status">Get status (walletd)
 ```
 ccx.status()
+```
+#### <a name="getBalance">Get balance (walletd)
+```
+const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
+ccx.getBalance(address)
 ```
 #### <a name="createAddress">Create address (walletd)
 ```
@@ -168,12 +175,7 @@ ccx.deleteAddress(address)
 ```
 ccx.getAddresses()
 ```
-#### <a name="getBalance">Get balance (walletd)
-```
-const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
-ccx.getBalance(address)
-```
-#### <a name="getViewSecretKey">Get view secret Key (walletd)
+#### <a name="getViewSecretKey">Get view secret key (walletd)
 ```
 ccx.getViewSecretKey()
 ```
@@ -220,7 +222,7 @@ const opts = { // either blockHash or firstBlockIndex is required
 }
 ccx.getTransactions(opts)
 ```
-#### <a name="sendTransactions">Send transactions without messages (walletd)
+#### <a name="sendTransaction">Send transaction without messages (walletd)
 ```
 const transfers = [{ address: ADDRESS, amount: AMOUNT }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required)
 const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = source address string; address in wallet to take funds from
@@ -234,7 +236,7 @@ const opts = {
   unlockHeight: UNLOCK_HEIGHT, // block height to unlock payment (non-negative integer, optional), ex: 12750
   extra: EXTRA // (variable length string, optional), ex: '123abc'
 }
-ccx.sendTransactions(opts)
+ccx.sendTransaction(opts)
 ```
 #### <a name="createDelayedTransaction">Create delayed transaction without messages (walletd)
 ```
