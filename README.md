@@ -190,12 +190,12 @@ const firstBlockIndex = FIRST_BLOCK_INDEX // index of first block (non-negative 
 const blockCount = BLOCK_COUNT // number of blocks to include (non-negative integer, required), ex: 30
 ccx.getBlockHashes(firstBlockIndex, blockCount)
 ```
-#### <a name="getTransaction">Get transaction
+#### <a name="getTransaction">Get transaction (walletd)
 ```
 const hash = HASH // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
 ccx.getTransaction(hash) // get transaction details given hash
 ```
-#### <a name="getUnconfirmedTransactions">Get unconfirmed transactions
+#### <a name="getUnconfirmedTransactions">Get unconfirmed transactions (walletd)
 ```
 const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = address string; address to include
 ccx.getUnconfirmedTransactions(addresses) // addresses can be omitted
