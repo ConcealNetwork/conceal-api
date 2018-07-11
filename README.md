@@ -232,6 +232,36 @@ const opts = {
 }
 ccx.sendTransactions(opts)
 ```
+#### <a name="createDelayedTransaction">Create delayed transaction without messages (walletd)
+```
+const transfers = [{ address: ADDRESS, amount: AMOUNT }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required)
+const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = source address string; address in wallet to take funds from
+const opts = {
+  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000 }]
+  addresses: addresses, // (array, optional), ex: ['ccx7Xd...', 'ccx7Xe...']
+  changeAddress: ADDRESS, // change return address (address string, optional if only one address in wallet or only one source address given), ex: 'ccx7Xd...'
+  paymentId: PAYMENT_ID, // filter (64-digit hexadecimal string, optional), ex: '0ab1...3f4b'
+  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
+  fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
+  unlockHeight: UNLOCK_HEIGHT, // block height to unlock payment (non-negative integer, optional), ex: 12750
+  extra: EXTRA // (variable length string, optional), ex: '123abc'
+}
+ccx.createDelayedTransaction(opts) // create but do not send transaction
+```
+#### <a name="getDelayedTransactionHashes">Get delayed transaction hashes (walletd)
+```
+ccx.getDelayedTransactionHashes()
+```
+#### <a name="deleteDelayedTransaction">Delete delayed transaction (walletd)
+```
+const hash = HASH // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
+ccx.deleteDelayedTransaction(hash)
+```
+#### <a name="sendDelayedTransaction">Send delayed transaction (walletd)
+```
+const hash = HASH // (64-digit hexadecimal string, required), ex: '0ab1...3f4b'
+ccx.sendDelayedTransaction(hash)
+```
 ### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 
 #### <a name="info">Get info

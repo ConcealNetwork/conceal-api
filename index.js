@@ -234,6 +234,7 @@ CCX.prototype.sendTransactions = function (opts) {
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
     else if (!isUndefined(opts.extra) && typeof opts.extra !== 'string') reject ('extra' + err.str)
     else {
+      opts.sourceAddresses = opts.addresses; delete opts.addresses
       if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
       if(!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
       else {
@@ -248,6 +249,52 @@ CCX.prototype.sendTransactions = function (opts) {
         }
       }
     }
+  })
+}
+
+CCX.prototype.createDelayedTransaction = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts)
+    else if (isUndefined(opts.transfers) || !arrayTest(opts.transfers, isTransfer)) reject('transfers' + err.arr + ' of transfers each of which' + err.trans)
+    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
+    else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
+    else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
+    else if (!isUndefined(opts.extra) && typeof opts.extra !== 'string') reject ('extra' + err.str)
+    else {
+      if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
+      if(!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
+      else {
+        opts.anonymity = opts.mixIn; delete opts.mixIn
+        if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_HEIGHT
+        if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
+        else {
+          opts.unlockTime = opts.unlockHeight; delete opts.unlockHeight
+          if (isUndefined(opts.fee)) opts.fee = DEFAULT_FEE * opts.transfers.length
+          if (!isNonNegative(opts.fee)) reject('fee' + err.raw)
+          else wrpc(this, 'createDelayedTransaction', opts, resolve, reject)
+        }
+      }
+    }
+  })
+}
+
+CCX.prototype.getDelayedTransactionHashes = function () {
+  return new Promise((resolve, reject) => {
+    wrpc(this, 'getDelayedTransactionHashes', { }, resolve, reject)
+  })
+}
+
+CCX.prototype.deleteDelayedTransaction = function (hash) {
+  return new Promise((resolve, reject) => {
+    if (!isHex64String(hash)) reject('hash' + err.hex64)
+    else wrpc(this, 'deleteDelayedTransaction', { transactionHash: hash }, resolve, reject)
+  })
+}
+
+CCX.prototype.sendDelayedTransaction = function (hash) {
+  return new Promise((resolve, reject) => {
+    if (!isHex64String(hash)) reject('hash' + err.hex64)
+    else wrpc(this, 'sendDelayedTransaction', { transactionHash: hash }, resolve, reject)
   })
 }
 
