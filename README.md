@@ -1,7 +1,7 @@
 # conceal-js
 Javascript/Node.js interface to Conceal cryptocurrency RPC/API.
 
-There are are three RPC servers that are built in to three programs *conceald*, *concealwallet* and *walletd*.
+There are three RPC servers built in to the three programs *conceald*, *concealwallet* and *walletd*.
 They can each be started with the argument `--help` to display command line options.
 
 ### conceald
@@ -11,7 +11,7 @@ $ ./conceald
 ```
 The default RPC port is 16000 and the default P2P port is 15000.
 ### walletd
-An optional node on the P2P network (daemon) with wallet functions; console non-interactive. To launch, assuming that your `my.wallet` file is in the current directory:
+A node on the P2P network (daemon) with wallet functions; console non-interactive. To launch, assuming that your `my.wallet` file is in the current directory:
 ```
 $ ./walletd --container-file my.wallet --container-password PASSWD --local --p2p-bind-port 15000 --daemon-port 16000 --bind-port 3333
 ```
