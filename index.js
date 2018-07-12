@@ -7,7 +7,7 @@ const MAX_MIXIN = 10
 const MIN_MIXIN = 2
 const DEFAULT_UNLOCK_HEIGHT = 0
 const DEFAULT_FEE = 10 // raw X
-const DEFAULT_CHARACTER_FEE = 0 // raw X
+const DEFAULT_CHARACTER_FEE = 10 // raw X
 
 const err = {
   nonNeg: ' must be a non-negative integer',
@@ -104,7 +104,7 @@ CCX.prototype.send = function (opts) {
         else {
           if (isUndefined(opts.fee)) {
             opts.fee = DEFAULT_FEE
-            opts.transfers && opts.transfers.forEach((transfer) => {
+            opts.transfers.forEach((transfer) => {
               opts.fee += (!isUndefined(transfer.message) ? transfer.message.length * DEFAULT_CHARACTER_FEE : 0)
             })
           }
