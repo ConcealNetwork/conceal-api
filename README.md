@@ -21,7 +21,7 @@ A simple wallet; console interactive unless RPC server is running; requires acce
 ```
 $ ./concealwallet --rpc-bind-port 3333 --wallet-file my --password PASSWORD
 ```
-The wallet functions RPC port is 3333. By default the wallet connects with the daemon on port 16000.
+The wallet functions RPC port is 3333. By default the wallet connects with the daemon on port 16000. It is possible to run several instances simultaneously using different wallets and ports.
 ## Quick start for node.js
 ```
 $ npm install conceal-js
