@@ -7,7 +7,7 @@ const MAX_MIXIN = 10
 const MIN_MIXIN = 2
 const DEFAULT_UNLOCK_HEIGHT = 0
 const DEFAULT_FEE = 10 // raw X
-const DEFAULT_MEMO_CHARACTER_FEE = 10 // raw X
+const DEFAULT_CHARACTER_FEE = 0 // raw X
 
 const err = {
   nonNeg: ' must be a non-negative integer',
@@ -56,9 +56,10 @@ CCX.prototype.messages = function (opts) {
     else if (!isUndefined(opts.firstTxId) && !isNonNegative(opts.firstTxId)) reject('firstTxId' + err.nonNeg)
     else if (!isUndefined(opts.txLimit) && !isNonNegative(opts.txLimit)) reject('txLimit' + err.nonNeg)
     else {
-      obj = {}
-      if (opts.firstTxId) obj.first_tx_id = opts.firstTxId
-      if (opts.txLimit) obj.tx_limit = opts.txLimit
+      obj = {
+        first_tx_id: opts.firstTxId,
+        tx_limit: opts.txLimit
+      }
       wrpc(this, 'get_messages', obj, resolve, reject)
     }
   })
@@ -102,15 +103,21 @@ CCX.prototype.send = function (opts) {
         if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
         else {
           if (isUndefined(opts.fee)) {
-            opts.fee = DEFAULT_FEE * opts.transfers.length
-            opts.transfers.forEach((transfer) => {
-              opts.fee += (!isUndefined(transfer.message) ? transfer.message.length * DEFAULT_MEMO_CHARACTER_FEE : 0)
+            opts.fee = DEFAULT_FEE
+            opts.transfers && opts.transfers.forEach((transfer) => {
+              opts.fee += (!isUndefined(transfer.message) ? transfer.message.length * DEFAULT_CHARACTER_FEE : 0)
             })
           }
           if (!isNonNegative(opts.fee)) reject('fee' + err.raw)
           else {
-            const obj = { destinations: opts.transfers, mixin: opts.mixIn, fee: opts.fee, unlock_time: opts.unlockHeight }
-            if (opts.paymentId) obj.payment_id = opts.paymentId
+            const obj = {
+              destinations: opts.transfers,
+              messages: opts.messages,
+              mixin: opts.mixIn,
+              fee: opts.fee,
+              unlock_time: opts.unlockHeight,
+              payment_id: opts.paymentId
+            }
             wrpc(this, 'transfer', obj, resolve, reject)
           }
         }
@@ -124,11 +131,7 @@ CCX.prototype.send = function (opts) {
 CCX.prototype.resetOrReplace = function (viewSecretKey) {
   return new Promise((resolve, reject) => {
     if (!isUndefined(viewSecretKey) && !isHex64String(viewSecretKey)) reject('viewSecretKey' + err.hex64)
-    else {
-      const obj = { }
-      if (viewSecretKey) obj.viewSecretKey = viewSecretKey
-      wrpc(this, 'reset', obj, resolve, reject)
-    }
+    else wrpc(this, 'reset', { viewSecretKey: viewSecretKey }, resolve, reject)
   })
 }
 
@@ -232,7 +235,7 @@ CCX.prototype.sendTransaction = function (opts) {
     else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
     else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
-    else if (!isUndefined(opts.extra) && typeof opts.extra !== 'string') reject ('extra' + err.str)
+    else if (!isUndefined(opts.extra) && !isString(opts.extra)) reject ('extra' + err.str)
     else {
       opts.sourceAddresses = opts.addresses; delete opts.addresses
       if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
@@ -259,7 +262,7 @@ CCX.prototype.createDelayedTransaction = function (opts) {
     else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
     else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
-    else if (!isUndefined(opts.extra) && typeof opts.extra !== 'string') reject ('extra' + err.str)
+    else if (!isUndefined(opts.extra) && !isString(opts.extra)) reject ('extra' + err.str)
     else {
       if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
       if(!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
@@ -447,9 +450,11 @@ function isObject (obj) { return typeof obj === 'object' }
 
 function isUndefined (obj) { return typeof obj === 'undefined' }
 
+function isString(obj) { return typeof obj === 'string' }
+
 function isTransfer (obj) {
-  if (!isObject(obj) || isUndefined(obj.address) || !isAddress(obj.address) || isUndefined(obj.amount) || !isNonNegative(obj.amount)) return false
-  if (typeof obj.message !== 'undefined' && typeof obj.message !== 'string') return false
+  if (!isObject(obj) || !isAddress(obj.address) || !isNonNegative(obj.amount)) return false
+  if (typeof obj.message !== 'undefined' && !isString(obj.message)) return false
   return true
 }
 
