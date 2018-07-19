@@ -60,7 +60,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get transfers](#transfers)
     * [Reset wallet](#reset)
     * [Store wallet](#store)
-    * [Send transfers with messages](#send)
+    * [Send transfers](#send)
   * walletd
     * [Reset or replace wallet](#resetOrReplace)
     * [Get status](#status)
@@ -76,7 +76,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get transaction hashes](#getTransactionHashes)
     * [Get transactions](#getTransactions)
     * [Send transaction without messages](#sendTransaction)
-    * [Create delayed transaction without messages](#createDelayedTransaction)
+    * [Create delayed transaction](#createDelayedTransaction)
     * [Get delayed transaction hashes](#getDelayedTransactionHashes)
     * [Delete delayed transaction](#deleteDelayedTransaction)
     * [Send delayed transaction](#sendDelayedTransaction)
@@ -135,7 +135,7 @@ ccx.reset() // discard wallet cache and resync with block chain
 ```
 ccx.store() // save wallet cache to disk
 ```
-#### <a name="send">Send transfers with messages (concealwallet)
+#### <a name="send">Send transfers (concealwallet)
 ```
 const transfers = [{ address: ADDRESS, amount: AMOUNT, message: MESSAGE }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required), MESSAGE = transfer message to be encrypted (string, optional)
 const opts = {
@@ -221,9 +221,9 @@ const opts = { // either blockHash or firstBlockIndex is required
 }
 ccx.getTransactions(opts)
 ```
-#### <a name="sendTransaction">Send transaction without messages (walletd)
+#### <a name="sendTransaction">Send transaction (walletd)
 ```
-const transfers = [{ address: ADDRESS, amount: AMOUNT }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required)
+const transfers = [{ address: ADDRESS, amount: AMOUNT }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required), MESSAGE = transfer message to be encrypted (string, optional)
 const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = source address string; address in wallet to take funds from
 const opts = {
   transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000 }]
@@ -261,6 +261,11 @@ ccx.getDelayedTransactionHashes()
 ```
 const hash = HASH // (64-digit hex string, required), ex: '0ab1...3f4b'
 ccx.deleteDelayedTransaction(hash)
+```
+#### <a name="getMessagesFromExtra">Get incoming messages from transaction extra field (walletd)
+```
+const extra = EXTRA // (hex string, required), ex: '0199...c3ca'
+ccx.getMessagesFromExtra(extra)
 ```
 #### <a name="sendDelayedTransaction">Send delayed transaction (walletd)
 ```
