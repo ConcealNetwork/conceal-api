@@ -75,7 +75,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get unconfirmed transactions](#getUnconfirmedTransactions)
     * [Get transaction hashes](#getTransactionHashes)
     * [Get transactions](#getTransactions)
-    * [Send transaction without messages](#sendTransaction)
+    * [Send transaction](#sendTransaction)
     * [Create delayed transaction](#createDelayedTransaction)
     * [Get delayed transaction hashes](#getDelayedTransactionHashes)
     * [Delete delayed transaction](#deleteDelayedTransaction)
@@ -237,7 +237,7 @@ const opts = {
 }
 ccx.sendTransaction(opts)
 ```
-#### <a name="createDelayedTransaction">Create delayed transaction without messages (walletd)
+#### <a name="createDelayedTransaction">Create delayed transaction (walletd)
 ```
 const transfers = [{ address: ADDRESS, amount: AMOUNT }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required)
 const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = source address string; address in wallet to take funds from
