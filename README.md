@@ -80,6 +80,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get delayed transaction hashes](#getDelayedTransactionHashes)
     * [Delete delayed transaction](#deleteDelayedTransaction)
     * [Send delayed transaction](#sendDelayedTransaction)
+    * [Get incoming messages from transaction extra field](#getMessagesFromExtra)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
@@ -262,15 +263,15 @@ ccx.getDelayedTransactionHashes()
 const hash = HASH // (64-digit hex string, required), ex: '0ab1...3f4b'
 ccx.deleteDelayedTransaction(hash)
 ```
-#### <a name="getMessagesFromExtra">Get incoming messages from transaction extra field (walletd)
-```
-const extra = EXTRA // (hex string, required), ex: '0199...c3ca'
-ccx.getMessagesFromExtra(extra)
-```
 #### <a name="sendDelayedTransaction">Send delayed transaction (walletd)
 ```
 const hash = HASH // (64-digit hex string, required), ex: '0ab1...3f4b'
 ccx.sendDelayedTransaction(hash)
+```
+#### <a name="getMessagesFromExtra">Get incoming messages from transaction extra field (walletd)
+```
+const extra = EXTRA // (hex string, required), ex: '0199...c3ca'
+ccx.getMessagesFromExtra(extra)
 ```
 ### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 
