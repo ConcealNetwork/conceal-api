@@ -17,7 +17,6 @@ const err = {
   addr: ' must be 98-character string beginning with ccx',
   raw: ' must be a raw amount of CCX (X)',
   trans: ' must be a transfer object { address: 98-character string beginning with ccx, amount: raw amount of CCX (X), message: optional string }',
-  mess: ' must be a message object { address: 98-character string beginning with ccx, message: string }',
   arr:  ' must be an array',
   str: ' must be a string'
 }
