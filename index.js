@@ -17,6 +17,7 @@ const err = {
   addr: ' must be 98-character string beginning with ccx',
   raw: ' must be a raw amount of CCX (X)',
   trans: ' must be a transfer object { address: 98-character string beginning with ccx, amount: raw amount of CCX (X), message: optional string }',
+  mess: ' must be a message object { address: 98-character string beginning with ccx, message: string }',
   arr:  ' must be an array',
   str: ' must be a string'
 }
@@ -112,7 +113,6 @@ CCX.prototype.send = function (opts) {
           else {
             const obj = {
               destinations: opts.transfers,
-              messages: opts.messages,
               mixin: opts.mixIn,
               fee: opts.fee,
               unlock_time: opts.unlockHeight,
@@ -246,7 +246,12 @@ CCX.prototype.sendTransaction = function (opts) {
         if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
         else {
           opts.unlockTime = opts.unlockHeight; delete opts.unlockHeight
-          if (isUndefined(opts.fee)) opts.fee = DEFAULT_FEE * opts.transfers.length
+          if (isUndefined(opts.fee)) {
+            opts.fee = DEFAULT_FEE
+            opts.transfers.forEach((transfer) => {
+              opts.fee += (!isUndefined(transfer.message) ? transfer.message.length * DEFAULT_CHARACTER_FEE : 0)
+            })
+          }
           if (!isNonNegative(opts.fee)) reject('fee' + err.raw)
           else wrpc(this, 'sendTransaction', opts, resolve, reject)
         }
@@ -298,6 +303,13 @@ CCX.prototype.sendDelayedTransaction = function (hash) {
   return new Promise((resolve, reject) => {
     if (!isHex64String(hash)) reject('hash' + err.hex64)
     else wrpc(this, 'sendDelayedTransaction', { transactionHash: hash }, resolve, reject)
+  })
+}
+
+CCX.prototype.getMessagesFromExtra = function (extra) {
+  return new Promise((resolve, reject) => {
+    if (!isHexString(extra)) reject('extra' + err.hex)
+    else wrpc(this, 'getMessagesFromExtra', { extra: extra }, resolve, reject)
   })
 }
 
