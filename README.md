@@ -227,7 +227,7 @@ ccx.getTransactions(opts)
 const transfers = [{ address: ADDRESS, amount: AMOUNT, message: MESSAGE }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required), MESSAGE = transfer message to be encrypted (string, optional)
 const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = source address string; address in wallet to take funds from
 const opts = {
-  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000 }]
+  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, message: 'tip' }]
   addresses: addresses, // (array, optional), ex: ['ccx7Xd...', 'ccx7Xe...']
   changeAddress: ADDRESS, // change return address (address string, optional if only one address in wallet or only one source address given), ex: 'ccx7Xd...'
   paymentId: PAYMENT_ID, // filter (64-digit hex string, optional), ex: '0ab1...3f4b'
@@ -243,7 +243,7 @@ ccx.sendTransaction(opts)
 const transfers = [{ address: ADDRESS, amount: AMOUNT, message: MESSAGE }, ...] // ADDRESS = destination address (string, required), AMOUNT = raw CCX (integer, required), MESSAGE = transfer message to be encrypted (string, optional)
 const addresses = [ADDRESS1, ADDRESS2, ...] // ADDRESS = source address string; address in wallet to take funds from
 const opts = {
-  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000 }]
+  transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, message: 'tip' }]
   addresses: addresses, // (array, optional), ex: ['ccx7Xd...', 'ccx7Xe...']
   changeAddress: ADDRESS, // change return address (address string, optional if only one address in wallet or only one source address given), ex: 'ccx7Xd...'
   paymentId: PAYMENT_ID, // filter (64-digit hex string, optional), ex: '0ab1...3f4b'
