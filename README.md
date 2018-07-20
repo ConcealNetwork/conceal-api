@@ -9,13 +9,13 @@ A node on the P2P network (daemon) with no wallet functions; console interactive
 ```
 $ ./conceald
 ```
-The default RPC port is 16000 and the default P2P port is 15000.
+The default daemon RPC port is 16000 and the default P2P port is 15000.
 ### walletd
 A node on the P2P network (daemon) with wallet functions; console non-interactive. To launch, assuming that your `my.wallet` file is in the current directory:
 ```
 $ ./walletd --container-file my.wallet --container-password PASSWD --local --p2p-bind-port 15000 --daemon-port 16000 --bind-port 3333
 ```
-The wallet functions RPC port is 3333. The daemon P2P port is 15000. The `--local` option activates the daemon; otherwise, a remote daemon can be used. The daemon RPC port must be set but the built-in daemon RPC server is disabled.
+The wallet functions RPC port is 3333. The daemon P2P port is 15000. The `--local` option activates the daemon; otherwise, a remote daemon can be used. The daemon RPC port must be set even if the daemon RPC is not used.
 ### concealwallet
 A simple wallet; console interactive unless RPC server is running; requires access to a node daemon for full functionality. To launch, assuming that your `my.wallet` file is in the current directory:
 ```
