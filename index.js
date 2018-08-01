@@ -417,7 +417,7 @@ CCX.prototype.index = function () {
     hrpc(this, { }, '/getheight', resolve, reject)
   })
 }
-
+/*
 CCX.prototype.startMining = function (opts) {
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts)
@@ -432,7 +432,7 @@ CCX.prototype.stopMining = function () {
     hrpc(this, { }, '/stop_mining', resolve, reject)
   })
 }
-
+*/
 CCX.prototype.transactions = function (txs) {
   return new Promise((resolve, reject) => {
     if (!arrayTest(txs, isHex64String)) reject('txs' + err.arr + ' of transactions each of which ' + err.hex64)

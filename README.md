@@ -98,8 +98,6 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
   * [Get transactions](#transactions)
   * [Get transaction pool](#transactionPool)
   * [Send raw transaction](#sendRawTransaction)
-  * [Stop mining](#stopMining)
-  * [Start mining](#startMining)
 
 ### <a name="wallet"></a>Wallet RPC (must provide walletRpcPort)
 
@@ -353,18 +351,4 @@ ccx.transactionPool()
 ```
 const transaction = TRANSACTION // transaction blob (hex string, required), ex: ''01d86301...'
 ccx.sendRawTransaction(transaction)
-```
-#### <a name="stopMining">Stop mining
-```
-ccx.stopMining()
-```
-#### <a name="startMining">Start mining
-```
-const address = ADDRESS // mining address (string, required), ex: 'ccx7Xd...'
-const threads = THREADS // number of concurrent mining threads (integer, optional, default 0), ex: 2
-const opts = {
-  address: address,
-  threads: threads
-}
-ccx.startMining(opts)
 ```
