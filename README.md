@@ -316,7 +316,7 @@ ccx.block(hash)
 #### <a name="blocks">Get blocks
 ```
 const height = HEIGHT // (integer, required), ex: 12750
-ccx.blocks(height) // returns 31 blocks up to and including *height*
+ccx.blocks(height) // returns 31 blocks up to and including HEIGHT
 ```
 #### <a name="blockTemplate">Get block template
 ```
