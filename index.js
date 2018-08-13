@@ -38,6 +38,12 @@ function wrpc (that, method, params, resolve, reject) {
   request(that.protocol, that.host, that.walletRpcPort, buildRpc(method, params), '/json_rpc', resolve, reject)
 }
 
+CCX.prototype.outputs = function () {
+  return new Promise((resolve, reject) => {
+    wrpc(this, 'get_outputs', { }, resolve, reject)
+  })
+}
+
 CCX.prototype.height = function () {
   return new Promise((resolve, reject) => {
     wrpc(this, 'get_height', { }, resolve, reject)
@@ -87,6 +93,12 @@ CCX.prototype.store = function () {
 CCX.prototype.reset = function () {
   return new Promise((resolve, reject) => {
     wrpc(this, 'reset', { }, resolve, reject)
+  })
+}
+
+CCX.prototype.consolidate = function () {
+  return new Promise((resolve, reject) => {
+    wrpc(this, 'consolidate', { }, resolve, reject)
   })
 }
 
