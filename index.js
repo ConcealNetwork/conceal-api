@@ -96,9 +96,9 @@ CCX.prototype.reset = function () {
   })
 }
 
-CCX.prototype.consolidate = function () {
+CCX.prototype.optimize = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'consolidate', { }, resolve, reject)
+    wrpc(this, 'optimize', { }, resolve, reject)
   })
 }
 

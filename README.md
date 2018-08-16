@@ -61,7 +61,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get number of unlocked outputs](#outputs)
     * [Reset wallet](#reset)
     * [Store wallet](#store)
-    * [Consolidate outputs](#consolidate)
+    * [Optimize wallet](#optimize)
     * [Send transfers](#send)
   * walletd
     * [Reset or replace wallet](#resetOrReplace)
@@ -140,9 +140,9 @@ ccx.reset() // discard wallet cache and resync with block chain
 ```
 ccx.store() // save wallet cache to disk
 ```
-#### <a name="consolidate">Consolidate outputs (concealwallet)
+#### <a name="optimize">Optimize wallet (concealwallet)
 ```
-ccx.consolidate() // combines many available outputs into a few by sending to self
+ccx.optimize() // combines many available outputs into a few by sending to self
 ```
 #### <a name="send">Send transfers (concealwallet)
 ```
