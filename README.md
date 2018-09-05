@@ -150,7 +150,7 @@ const transfers = [{ address: ADDRESS, amount: AMOUNT, message: MESSAGE }, ...] 
 const opts = {
   transfers: transfers, // (array, required), ex: [{ address: 'ccx7Xd...', amount: 1000, message: 'refund' }]
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
-  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
+  anonimity: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
   paymentId: PAYMENT_ID, // (64-digit hex string, optional), ex: '0ab1...3f4b'
   unlockHeight: UNLOCK_HEIGHT // block height to unlock payment (integer, optional), ex: 12750
 }
@@ -239,7 +239,7 @@ const opts = {
   addresses: addresses, // (array, optional), ex: ['ccx7Xd...', 'ccx7Xe...']
   changeAddress: ADDRESS, // change return address (address string, optional if only one address in wallet or only one source address given), ex: 'ccx7Xd...'
   paymentId: PAYMENT_ID, // filter (64-digit hex string, optional), ex: '0ab1...3f4b'
-  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
+  anonimity: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
   unlockHeight: UNLOCK_HEIGHT, // block height to unlock payment (integer, optional), ex: 12750
   extra: EXTRA // (variable length string, optional), ex: '123abc'
@@ -255,7 +255,7 @@ const opts = {
   addresses: addresses, // (array, optional), ex: ['ccx7Xd...', 'ccx7Xe...']
   changeAddress: ADDRESS, // change return address (address string, optional if only one address in wallet or only one source address given), ex: 'ccx7Xd...'
   paymentId: PAYMENT_ID, // filter (64-digit hex string, optional), ex: '0ab1...3f4b'
-  mixIn: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
+  anonimity: MIX_IN, // input mix count (integer, optional, default 2), ex: 6
   fee: FEE, // (raw CCX integer, optional, default is minimum required), ex: 10
   unlockHeight: UNLOCK_HEIGHT, // block height to unlock payment (integer, optional), ex: 12750
   extra: EXTRA // (variable length string, optional), ex: '123abc'
