@@ -1,4 +1,4 @@
-# conceal-js
+# Conceal RPC/API
 Javascript/Node.js interface to Conceal cryptocurrency RPC/API.
 
 There are three RPC servers built in to the three programs *conceald*, *concealwallet* and *walletd*.
