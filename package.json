@@ -1,14 +1,14 @@
 {
   "name": "conceal-js",
-  "version": "0.7.2",
-  "description": "Javascript interface to Conceal Network RPC/API",
+  "version": "0.7.3",
+  "description": "CJSI: Conceal Javascript Interface - RPC/API",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ConcealNetwork/conceal-js.git"
+    "url": "git+https://github.com/ConcealNetwork/conceal-api.git"
   },
   "keywords": [
     "conceal",
@@ -19,7 +19,7 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ConcealNetwork/conceal-js/issues"
+    "url": "https://github.com/ConcealNetwork/conceal-api/issues"
   },
-  "homepage": "https://github.com/ConcealNetwork/conceal-js#readme"
+  "homepage": "https://github.com/ConcealNetwork/conceal-api#readme"
 }
