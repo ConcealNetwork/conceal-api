@@ -17,11 +17,11 @@ const err = {
   addr: ' must be 98-character string beginning with ccx',
   raw: ' must be a raw amount of CCX (X)',
   trans: ' must be a transfer object { address: 98-character string beginning with ccx, amount: raw amount of CCX (X), message: optional string }',
-  arr:  ' must be an array',
+  arr: ' must be an array',
   str: ' must be a string'
 }
 
-function CCX (host, walletRpcPort, daemonRpcPort) {
+function CCX(host, walletRpcPort, daemonRpcPort, timeout) {
   if (!host) throw 'host required'
   const parse = host.match(/^([^:]*):\/\/(.*)$/)
   if (parse[1] === 'http') this.protocol = http
@@ -30,29 +30,30 @@ function CCX (host, walletRpcPort, daemonRpcPort) {
   this.host = parse[2]
   this.walletRpcPort = walletRpcPort
   this.daemonRpcPort = daemonRpcPort
+  this.timeout = timeout || 5000;
 }
 
 // Wallet RPC -- concealwallet
 
-function wrpc (that, method, params, resolve, reject) {
-  request(that.protocol, that.host, that.walletRpcPort, buildRpc(method, params), '/json_rpc', resolve, reject)
+function wrpc(that, method, params, resolve, reject) {
+  request(that.protocol, that.host, that.walletRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject)
 }
 
 CCX.prototype.outputs = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'get_outputs', { }, resolve, reject)
+    wrpc(this, 'get_outputs', {}, resolve, reject)
   })
 }
 
 CCX.prototype.height = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'get_height', { }, resolve, reject)
+    wrpc(this, 'get_height', {}, resolve, reject)
   })
 }
 
 CCX.prototype.balance = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'getbalance', { }, resolve, reject)
+    wrpc(this, 'getbalance', {}, resolve, reject)
   })
 }
 
@@ -80,25 +81,25 @@ CCX.prototype.payments = function (paymentId) { // incoming payments
 
 CCX.prototype.transfers = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'get_transfers', { }, resolve, reject)
+    wrpc(this, 'get_transfers', {}, resolve, reject)
   })
 }
 
 CCX.prototype.store = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'store', { }, resolve, reject)
+    wrpc(this, 'store', {}, resolve, reject)
   })
 }
 
 CCX.prototype.reset = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'reset', { }, resolve, reject)
+    wrpc(this, 'reset', {}, resolve, reject)
   })
 }
 
 CCX.prototype.optimize = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'optimize', { }, resolve, reject)
+    wrpc(this, 'optimize', {}, resolve, reject)
   })
 }
 
@@ -109,7 +110,7 @@ CCX.prototype.send = function (opts) {
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
     else {
       if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
-      if(!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
+      if (!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
       else {
         if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_HEIGHT
         if (!isNonNegative(opts.unlockHeight)) reject('unlockHeight' + err.nonNeg)
@@ -148,7 +149,7 @@ CCX.prototype.resetOrReplace = function (viewSecretKey) {
 
 CCX.prototype.status = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'getStatus', { }, resolve, reject)
+    wrpc(this, 'getStatus', {}, resolve, reject)
   })
 }
 
@@ -161,7 +162,7 @@ CCX.prototype.getBalance = function (address) {
 
 CCX.prototype.createAddress = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'createAddress', { }, resolve, reject)
+    wrpc(this, 'createAddress', {}, resolve, reject)
   })
 }
 
@@ -174,13 +175,13 @@ CCX.prototype.deleteAddress = function (address) {
 
 CCX.prototype.getAddresses = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'getAddresses', { }, resolve, reject)
+    wrpc(this, 'getAddresses', {}, resolve, reject)
   })
 }
 
 CCX.prototype.getViewSecretKey = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'getViewKey', { }, resolve, reject)
+    wrpc(this, 'getViewKey', {}, resolve, reject)
   })
 }
 
@@ -246,11 +247,11 @@ CCX.prototype.sendTransaction = function (opts) {
     else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
     else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
-    else if (!isUndefined(opts.extra) && !isString(opts.extra)) reject ('extra' + err.str)
+    else if (!isUndefined(opts.extra) && !isString(opts.extra)) reject('extra' + err.str)
     else {
       opts.sourceAddresses = opts.addresses; delete opts.addresses
       if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
-      if(!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
+      if (!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
       else {
         opts.anonymity = opts.mixIn; delete opts.mixIn
         if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_HEIGHT
@@ -278,10 +279,10 @@ CCX.prototype.createDelayedTransaction = function (opts) {
     else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr)
     else if (!isUndefined(opts.changeAddress) && !isAddress(opts.changeAddress)) reject('changeAddress' + err.addr)
     else if (!isUndefined(opts.paymentId) && !isHex64String(opts.paymentId)) reject('paymentId' + err.hex64)
-    else if (!isUndefined(opts.extra) && !isString(opts.extra)) reject ('extra' + err.str)
+    else if (!isUndefined(opts.extra) && !isString(opts.extra)) reject('extra' + err.str)
     else {
       if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN
-      if(!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
+      if (!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN)
       else {
         opts.anonymity = opts.mixIn; delete opts.mixIn
         if (isUndefined(opts.unlockHeight)) opts.unlockHeight = DEFAULT_UNLOCK_HEIGHT
@@ -299,7 +300,7 @@ CCX.prototype.createDelayedTransaction = function (opts) {
 
 CCX.prototype.getDelayedTransactionHashes = function () {
   return new Promise((resolve, reject) => {
-    wrpc(this, 'getDelayedTransactionHashes', { }, resolve, reject)
+    wrpc(this, 'getDelayedTransactionHashes', {}, resolve, reject)
   })
 }
 
@@ -326,20 +327,20 @@ CCX.prototype.getMessagesFromExtra = function (extra) {
 
 // Daemon RPC - JSON RPC
 
-function drpc (that, method, params, resolve, reject) {
-  request(that.protocol, that.host, that.daemonRpcPort, buildRpc(method, params), '/json_rpc', resolve, reject)
+function drpc(that, method, params, resolve, reject) {
+  request(that.protocol, that.host, that.daemonRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject)
 }
 
 CCX.prototype.count = function () {
   return new Promise((resolve, reject) => {
-    drpc(this, 'getblockcount', { }, resolve, reject)
+    drpc(this, 'getblockcount', {}, resolve, reject)
   })
 }
 
 CCX.prototype.blockHashByHeight = function (height) {
   return new Promise((resolve, reject) => {
     if (!isNonNegative(height)) reject('height' + err.nonNeg)
-    else drpc(this, 'on_getblockhash', [ height ], resolve, reject)
+    else drpc(this, 'on_getblockhash', [height], resolve, reject)
   })
 }
 
@@ -359,7 +360,7 @@ CCX.prototype.blockHeaderByHeight = function (height) {
 
 CCX.prototype.lastBlockHeader = function () {
   return new Promise((resolve, reject) => {
-    drpc(this, 'getlastblockheader', { }, resolve, reject)
+    drpc(this, 'getlastblockheader', {}, resolve, reject)
   })
 }
 
@@ -386,13 +387,13 @@ CCX.prototype.transaction = function (hash) {
 
 CCX.prototype.transactionPool = function () {
   return new Promise((resolve, reject) => {
-    drpc(this, 'f_on_transactions_pool_json', { }, resolve, reject)
+    drpc(this, 'f_on_transactions_pool_json', {}, resolve, reject)
   })
 }
 
 CCX.prototype.currencyId = function () {
   return new Promise((resolve, reject) => {
-    drpc(this, 'getcurrencyid', { }, resolve, reject)
+    drpc(this, 'getcurrencyid', {}, resolve, reject)
   })
 }
 
@@ -414,19 +415,19 @@ CCX.prototype.submitBlock = function (block) {
 
 // Daemon RPC - JSON handlers
 
-function hrpc (that, params, path, resolve, reject) {
-  request(that.protocol, that.host, that.daemonRpcPort, JSON.stringify(params), path, resolve, reject)
+function hrpc(that, params, path, resolve, reject) {
+  request(that.protocol, that.host, that.daemonRpcPort, that.timeout, JSON.stringify(params), path, resolve, reject)
 }
 
 CCX.prototype.info = function () {
   return new Promise((resolve, reject) => {
-    hrpc(this, { }, '/getinfo', resolve, reject)
+    hrpc(this, {}, '/getinfo', resolve, reject)
   })
 }
 
 CCX.prototype.index = function () {
   return new Promise((resolve, reject) => {
-    hrpc(this, { }, '/getheight', resolve, reject)
+    hrpc(this, {}, '/getheight', resolve, reject)
   })
 }
 /*
@@ -469,42 +470,43 @@ function arrayTest(arr, test) {
   return true
 }
 
-function isObject (obj) { return typeof obj === 'object' }
+function isObject(obj) { return typeof obj === 'object' }
 
-function isUndefined (obj) { return typeof obj === 'undefined' }
+function isUndefined(obj) { return typeof obj === 'undefined' }
 
 function isString(obj) { return typeof obj === 'string' }
 
-function isTransfer (obj) {
+function isTransfer(obj) {
   if (!isObject(obj) || !isAddress(obj.address) || !isNonNegative(obj.amount)) return false
   if (typeof obj.message !== 'undefined' && !isString(obj.message)) return false
   return true
 }
 
-function isNonNegative (n) { return (Number.isInteger(n) && n >= 0) }
+function isNonNegative(n) { return (Number.isInteger(n) && n >= 0) }
 
-function isNumeric (n) { return !isNaN(parseFloat(n)) && isFinite(n) }
+function isNumeric(n) { return !isNaN(parseFloat(n)) && isFinite(n) }
 
-function isAddress (str) { return (typeof str === 'string' &&  str.length === 98 && str.slice(0, 3) === 'ccx') }
+function isAddress(str) { return (typeof str === 'string' && str.length === 98 && str.slice(0, 3) === 'ccx') }
 
-function isHex64String (str) { return (typeof str === 'string' && /^[0-9a-fA-F]{64}$/.test(str)) }
+function isHex64String(str) { return (typeof str === 'string' && /^[0-9a-fA-F]{64}$/.test(str)) }
 
-function isHexString (str) { return (typeof str === 'string' && !/[^0-9a-fA-F]/.test(str)) }
+function isHexString(str) { return (typeof str === 'string' && !/[^0-9a-fA-F]/.test(str)) }
 
-function buildRpc (method, params) { return '{"jsonrpc":"2.0","id":"0","method":"' + method + '","params":'+ JSON.stringify(params) + '}' }
+function buildRpc(method, params) { return '{"jsonrpc":"2.0","id":"0","method":"' + method + '","params":' + JSON.stringify(params) + '}' }
 
-function request (protocol, host, port, post, path, resolve, reject) {
+function request(protocol, host, port, timeout, post, path, resolve, reject) {
   const obj = {
     hostname: host,
     port: port,
     method: 'POST',
+    timeout: timeout,
     path: path,
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': post.length,
     }
   }
-  protocol.request(
+  var doRequest = protocol.request(
     obj,
     (res) => {
       let data = Buffer.alloc(0)
@@ -518,5 +520,16 @@ function request (protocol, host, port, post, path, resolve, reject) {
         resolve(data)
       })
     }
-  ).on('error', (error) => { reject('RPC server error') }).end(post)
+  );
+
+  doRequest.on('error', (error) => {
+    reject('RPC server error')
+  });
+
+  doRequest.on('timeout', () => {
+    reject("RFC timeout");
+    doRequest.abort();
+  });
+
+  doRequest.end(post);
 }
