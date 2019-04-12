@@ -24,7 +24,7 @@ $ ./concealwallet --rpc-bind-port 3333 --wallet-file my --password PASSWORD
 The wallet functions RPC port is 3333. By default the wallet connects with the daemon on port 16000. It is possible to run several instances simultaneously using different wallets and ports.
 ## Quick start for node.js
 ```
-$ npm install conceal-js
+$ npm install conceal-api
 $ ./conceald # launch the network daemon
 $ ./concealwallet --rpc-bind-port PORT --wallet-file my --password PASSWORD # launch the simple wallet
 ```
@@ -34,7 +34,7 @@ $ node test.js
 ```
 The test program could contain, for example, a payment via the simple wallet's RPC server
 ```
-const CCX = require('conceal-js')
+const CCX = require('conceal-api')
 const ccx = new CCX('http://localhost', '3333')
 
 ccx.send([{
@@ -46,8 +46,8 @@ ccx.send([{
 ```
 ## API
 ```
-const CCX = require('conceal-js')
-const ccx = new CCX(host, walletRpcPort, daemonRpcPort)
+const CCX = require('conceal-api')
+const ccx = new CCX(host, walletRpcPort, daemonRpcPort, timeout)
 ```
 ccx.rpc returns a promise, where *rpc* is any of the methods below:
 
