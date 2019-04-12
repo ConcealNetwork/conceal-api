@@ -1,6 +1,6 @@
 {
   "name": "conceal-js",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "CJSI: Conceal Javascript Interface - RPC/API",
   "main": "index.js",
   "scripts": {
