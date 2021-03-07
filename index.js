@@ -21,22 +21,57 @@ const err = {
   str: ' must be a string'
 };
 
+// simple (deprecated constructor)
 function CCX(host, walletRpcPort, daemonRpcPort, timeout) {
+  console.log("this constructor is deprecated, please use CCXApi");
+
   if (!host) throw 'host required';
   const parse = host.match(/^([^:]*):\/\/(.*)$/);
-  if (parse[1] === 'http') this.protocol = http;
-  else if (parse[1] === 'https') this.protocol = https;
-  else throw 'host must begin with http(s)://';
-  this.host = parse[2];
+
+  if (parse[1] === 'http') {
+    this.protocolDaemon = http;
+    this.protocolWallet = http;
+  }
+  else if (parse[1] === 'https') {
+    this.protocolDaemon = https;
+    this.protocolWallet = https;
+  }
+  else {
+    throw 'host must begin with http(s)://';
+  }
+
+  this.hostDaemon = parse[2];
+  this.hostWallet = parse[2];
   this.walletRpcPort = walletRpcPort;
   this.daemonRpcPort = daemonRpcPort;
   this.timeout = timeout || 5000;
 }
 
+function CCXApi(params) {
+  if (!params) throw 'parameters are required';
+  if (!params.host) throw 'host required';
+  const parseDaemon = params.hostDaemon.match(/^([^:]*):\/\/(.*)$/);
+  const parseWallet = params.hostWallet.match(/^([^:]*):\/\/(.*)$/);
+
+  if (parseDaemon[1] === 'http') this.protocolDaemon = http;
+  else if (parseDaemon[1] === 'https') this.protocolDaemon = https;
+  else throw 'Daemon host must begin with http(s)://';
+
+  if (parseWallet[1] === 'http') this.protocolWallet = http;
+  else if (parseWallet[1] === 'https') this.protocolWallet = https;
+  else throw 'Wallet host must begin with http(s)://';
+
+  this.params.hostDaemon = parseDaemon[2];
+  this.params.hostWallet = parseWallet[2];
+  this.walletRpcPort = params.walletRpcPort;
+  this.daemonRpcPort = params.daemonRpcPort;
+  this.timeout = params.timeout || 5000;
+}
+
 // Wallet RPC -- concealwallet
 
 function wrpc(that, method, params, resolve, reject) {
-  request(that.protocol, that.host, that.walletRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
+  request(that.protocolWallet, that.hostWallet, that.walletRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
 }
 
 CCX.prototype.outputs = function () {
@@ -328,7 +363,7 @@ CCX.prototype.getMessagesFromExtra = function (extra) {
 // Daemon RPC - JSON RPC
 
 function drpc(that, method, params, resolve, reject) {
-  request(that.protocol, that.host, that.daemonRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
+  request(that.protocolDaemon, that.hostDaemon, that.daemonRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
 }
 
 CCX.prototype.count = function () {
