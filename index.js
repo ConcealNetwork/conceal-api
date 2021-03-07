@@ -21,49 +21,24 @@ const err = {
   str: ' must be a string'
 };
 
-// simple (deprecated constructor)
-function CCX(host, walletRpcPort, daemonRpcPort, timeout) {
-  console.log("this constructor is deprecated, please use CCXApi");
-
-  if (!host) throw 'host required';
-  const parse = host.match(/^([^:]*):\/\/(.*)$/);
-
-  if (parse[1] === 'http') {
-    this.protocolDaemon = http;
-    this.protocolWallet = http;
-  }
-  else if (parse[1] === 'https') {
-    this.protocolDaemon = https;
-    this.protocolWallet = https;
-  }
-  else {
-    throw 'host must begin with http(s)://';
-  }
-
-  this.hostDaemon = parse[2];
-  this.hostWallet = parse[2];
-  this.walletRpcPort = walletRpcPort;
-  this.daemonRpcPort = daemonRpcPort;
-  this.timeout = timeout || 5000;
-}
-
-function CCXApi(params) {
+function CCX(params) {
   if (!params) throw 'parameters are required';
-  if (!params.hostDaemon) params.hostDaemon = '127.0.0.1';
-  if (!params.hostWallet) params.hostWallet = '127.0.0.1';
-  const parseDaemon = params.hostDaemon.match(/^([^:]*):\/\/(.*)$/);
-  const parseWallet = params.hostWallet.match(/^([^:]*):\/\/(.*)$/);
+  if (typeof params != 'object') throw 'parameters must be a JSON object';
+  if (!params.daemonHost) params.daemonHost = '127.0.0.1';
+  if (!params.walletHost) params.walletHost = '127.0.0.1';
+  const parseDaemon = params.daemonHost.match(/^([^:]*):\/\/(.*)$/);
+  const parseWallet = params.walletHost.match(/^([^:]*):\/\/(.*)$/);
 
-  if (parseDaemon[1] === 'http') this.protocolDaemon = http;
-  else if (parseDaemon[1] === 'https') this.protocolDaemon = https;
+  if (parseDaemon[1] === 'http') this.daemonProtocol = http;
+  else if (parseDaemon[1] === 'https') this.daemonProtocol = https;
   else throw 'Daemon host must begin with http(s)://';
 
-  if (parseWallet[1] === 'http') this.protocolWallet = http;
-  else if (parseWallet[1] === 'https') this.protocolWallet = https;
+  if (parseWallet[1] === 'http') this.walletProtocol = http;
+  else if (parseWallet[1] === 'https') this.walletProtocol = https;
   else throw 'Wallet host must begin with http(s)://';
 
-  this.params.hostDaemon = parseDaemon[2];
-  this.params.hostWallet = parseWallet[2];
+  this.daemonHost = parseDaemon[2];
+  this.walletHost = parseWallet[2];
   this.walletRpcPort = params.walletRpcPort;
   this.daemonRpcPort = params.daemonRpcPort;
   this.timeout = params.timeout || 5000;
@@ -72,7 +47,7 @@ function CCXApi(params) {
 // Wallet RPC -- concealwallet
 
 function wrpc(that, method, params, resolve, reject) {
-  request(that.protocolWallet, that.hostWallet, that.walletRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
+  request(that.walletProtocol, that.walletHost, that.walletRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
 }
 
 CCX.prototype.outputs = function () {
@@ -364,7 +339,7 @@ CCX.prototype.getMessagesFromExtra = function (extra) {
 // Daemon RPC - JSON RPC
 
 function drpc(that, method, params, resolve, reject) {
-  request(that.protocolDaemon, that.hostDaemon, that.daemonRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
+  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
 }
 
 CCX.prototype.count = function () {
@@ -452,7 +427,7 @@ CCX.prototype.submitBlock = function (block) {
 // Daemon RPC - JSON handlers
 
 function hrpc(that, params, path, resolve, reject) {
-  request(that.protocolWallet, that.hostWallet, that.daemonRpcPort, that.timeout, JSON.stringify(params), path, resolve, reject);
+  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, that.timeout, JSON.stringify(params), path, resolve, reject);
 }
 
 CCX.prototype.info = function () {
