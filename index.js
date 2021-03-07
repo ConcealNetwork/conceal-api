@@ -49,7 +49,8 @@ function CCX(host, walletRpcPort, daemonRpcPort, timeout) {
 
 function CCXApi(params) {
   if (!params) throw 'parameters are required';
-  if (!params.host) throw 'host required';
+  if (!params.hostDaemon) params.hostDaemon = '127.0.0.1';
+  if (!params.hostWallet) params.hostWallet = '127.0.0.1';
   const parseDaemon = params.hostDaemon.match(/^([^:]*):\/\/(.*)$/);
   const parseWallet = params.hostWallet.match(/^([^:]*):\/\/(.*)$/);
 
@@ -451,7 +452,7 @@ CCX.prototype.submitBlock = function (block) {
 // Daemon RPC - JSON handlers
 
 function hrpc(that, params, path, resolve, reject) {
-  request(that.protocol, that.host, that.daemonRpcPort, that.timeout, JSON.stringify(params), path, resolve, reject);
+  request(that.protocolWallet, that.hostWallet, that.daemonRpcPort, that.timeout, JSON.stringify(params), path, resolve, reject);
 }
 
 CCX.prototype.info = function () {
