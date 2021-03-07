@@ -35,7 +35,12 @@ $ node test.js
 The test program could contain, for example, a payment via the simple wallet's RPC server
 ```
 const CCX = require('conceal-api')
-const ccx = new CCX('http://localhost', '3333')
+const ccx = new CCX({
+  daemonHost: 'http://localhost', 
+  walletHost: 'http://localhost', 
+  daemonRpcPort: 16000,
+  walletRpcPort: 3333
+})
 
 ccx.send([{
   address: 'ccx7Xd3NBbBiQNvv7vMLXmGMHyS8AVB6EhWoHo5EbGfR2Ki9pQnRTfEBt3YxYEVqpUCyJgvPjBYHp8N2yZwA7dqb4PjaGWuvs4',
@@ -47,7 +52,13 @@ ccx.send([{
 ## API
 ```
 const CCX = require('conceal-api')
-const ccx = new CCX(host, walletRpcPort, daemonRpcPort, timeout)
+const ccx = new CCX({
+  daemonHost: <daemonHost>, 
+  walletHost: <walletHost>,
+  daemonRpcPort: <daemonRpcPort>,
+  walletRpcPort: <walletRpcPort>,
+  timeout: <timeout>
+})
 ```
 ccx.rpc returns a promise, where *rpc* is any of the methods below:
 
