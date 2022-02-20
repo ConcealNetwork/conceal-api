@@ -3,10 +3,10 @@ module.exports = CCX;
 const http = require('http');
 const https = require('https');
 
-const MAX_MIXIN = 10;
-const MIN_MIXIN = 2;
-const DEFAULT_UNLOCK_HEIGHT = 0;
-const DEFAULT_FEE = 10; // raw X
+const MAX_MIXIN = 5;
+const MIN_MIXIN = 3;
+const DEFAULT_UNLOCK_HEIGHT = 10;
+const DEFAULT_FEE = 1000; // raw X
 const DEFAULT_CHARACTER_FEE = 10; // raw X
 
 const err = {
