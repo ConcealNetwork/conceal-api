@@ -29,16 +29,20 @@ function CCX(params) {
   const parseDaemon = params.daemonHost.match(/^([^:]*):\/\/(.*)$/);
   const parseWallet = params.walletHost.match(/^([^:]*):\/\/(.*)$/);
 
-  if (parseDaemon[1] === 'http') this.daemonProtocol = http;
-  else if (parseDaemon[1] === 'https') this.daemonProtocol = https;
-  else throw 'Daemon host must begin with http(s)://';
+  if (parseDaemon) {
+    if (parseDaemon[1] === 'http') this.daemonProtocol = http;    
+    else if (parseDaemon[1] === 'https') this.daemonProtocol = https;
+    else throw 'Daemon host must begin with http(s)://';
+  }
 
-  if (parseWallet[1] === 'http') this.walletProtocol = http;
-  else if (parseWallet[1] === 'https') this.walletProtocol = https;
-  else throw 'Wallet host must begin with http(s)://';
+  if (parseWallet) {
+    if (parseWallet[1] === 'http') this.walletProtocol = http;
+    else if (parseWallet[1] === 'https') this.walletProtocol = https;
+    else throw 'Wallet host must begin with http(s)://';
+  }
 
-  this.daemonHost = parseDaemon[2];
-  this.walletHost = parseWallet[2];
+  this.daemonHost = parseDaemon ? parseDaemon[2] : null;
+  this.walletHost = parseWallet ? parseWallet[2] : null;
   this.walletRpcPort = params.walletRpcPort;
   this.daemonRpcPort = params.daemonRpcPort;
   this.timeout = params.timeout || 5000;
