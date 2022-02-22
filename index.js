@@ -48,6 +48,16 @@ function CCX(params) {
   this.walletRpcPort = params.walletRpcPort;
   this.daemonRpcPort = params.daemonRpcPort;
   this.timeout = params.timeout || 5000;
+
+  // check daemon path and if its empty set it to emty string
+  if ((this.daemonPath == '/') || (!this.daemonPath)) {
+    this.daemonPath = "";
+  }
+
+  // check wallet path and if its empty set it to emty string
+  if ((this.walletPath == '/') || (!this.walletPath)) {
+    this.walletPath = "";
+  }
 }
 
 // Wallet RPC -- concealwallet
