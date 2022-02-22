@@ -1,7 +1,7 @@
 module.exports = CCX;
 
-const http = require('http');
-const https = require('https');
+const { http, https } = require('follow-redirects');
+const url = require('url');
 
 const MAX_MIXIN = 5;
 const MIN_MIXIN = 3;
@@ -24,25 +24,27 @@ const err = {
 function CCX(params) {
   if (!params) throw 'parameters are required';
   if (typeof params != 'object') throw 'parameters must be a JSON object';
-  if (!params.daemonHost) params.daemonHost = '127.0.0.1';
-  if (!params.walletHost) params.walletHost = '127.0.0.1';
-  const parseDaemon = params.daemonHost.match(/^([^:]*):\/\/(.*)$/);
-  const parseWallet = params.walletHost.match(/^([^:]*):\/\/(.*)$/);
+
+  // parse both daemon and wallet urls
+  const parseDaemon = params.daemonHost ? new URL(params.daemonHost) : null;
+  const parseWallet = params.walletHost ? new URL(params.walletHost) : null;
 
   if (parseDaemon) {
-    if (parseDaemon[1] === 'http') this.daemonProtocol = http;    
-    else if (parseDaemon[1] === 'https') this.daemonProtocol = https;
+    if (parseDaemon.protocol === 'http:') this.daemonProtocol = http;    
+    else if (parseDaemon.protocol === 'https:') this.daemonProtocol = https;
     else throw 'Daemon host must begin with http(s)://';
   }
 
   if (parseWallet) {
-    if (parseWallet[1] === 'http') this.walletProtocol = http;
-    else if (parseWallet[1] === 'https') this.walletProtocol = https;
+    if (parseWallet.protocol === 'http:') this.walletProtocol = http;
+    else if (parseWallet.protocol === 'https:') this.walletProtocol = https;
     else throw 'Wallet host must begin with http(s)://';
   }
 
-  this.daemonHost = parseDaemon ? parseDaemon[2] : null;
-  this.walletHost = parseWallet ? parseWallet[2] : null;
+  this.daemonHost = parseDaemon ? parseDaemon.host : null;
+  this.walletHost = parseWallet ? parseWallet.host : null;
+  this.daemonPath = parseDaemon ? parseDaemon.pathname : null;
+  this.walletPath = parseWallet ? parseWallet.pathname : null;
   this.walletRpcPort = params.walletRpcPort;
   this.daemonRpcPort = params.daemonRpcPort;
   this.timeout = params.timeout || 5000;
@@ -51,7 +53,7 @@ function CCX(params) {
 // Wallet RPC -- concealwallet
 
 function wrpc(that, method, params, resolve, reject) {
-  request(that.walletProtocol, that.walletHost, that.walletRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
+  request(that.walletProtocol, that.walletHost, that.walletRpcPort, 'POST', that.timeout, buildRpc(method, params), that.walletPath + '/json_rpc', resolve, reject);
 }
 
 CCX.prototype.outputs = function () {
@@ -343,7 +345,7 @@ CCX.prototype.getMessagesFromExtra = function (extra) {
 // Daemon RPC - JSON RPC
 
 function drpc(that, method, params, resolve, reject) {
-  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, that.timeout, buildRpc(method, params), '/json_rpc', resolve, reject);
+  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, 'POST', that.timeout, buildRpc(method, params), that.daemonPath + '/json_rpc', resolve, reject);
 }
 
 CCX.prototype.count = function () {
@@ -431,7 +433,7 @@ CCX.prototype.submitBlock = function (block) {
 // Daemon RPC - JSON handlers
 
 function hrpc(that, params, path, resolve, reject) {
-  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, that.timeout, JSON.stringify(params), path, resolve, reject);
+  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, 'GET', that.timeout, JSON.stringify(params), that.daemonPath + path, resolve, reject);
 }
 
 CCX.prototype.info = function () {
@@ -509,11 +511,11 @@ function isHexString(str) { return (typeof str === 'string' && !/[^0-9a-fA-F]/.t
 
 function buildRpc(method, params) { return '{"jsonrpc":"2.0","id":"0","method":"' + method + '","params":' + JSON.stringify(params) + '}'; }
 
-function request(protocol, host, port, timeout, post, path, resolve, reject) {
+function request(protocol, host, port, method, timeout, post, path, resolve, reject) {
   const obj = {
     hostname: host,
     port: port,
-    method: 'POST',
+    method: method,
     timeout: timeout,
     path: path,
     headers: {
@@ -525,7 +527,9 @@ function request(protocol, host, port, timeout, post, path, resolve, reject) {
     obj,
     (res) => {
       let data = Buffer.alloc(0);
-      res.on('data', (chunk) => { data = Buffer.concat([data, chunk]); });
+      res.on('data', (chunk) => { 
+        data = Buffer.concat([data, chunk]); 
+      });
       res.on('end', () => {
         try {
           data = JSON.parse(data.toString());
