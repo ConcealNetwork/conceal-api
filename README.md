@@ -55,8 +55,11 @@ const CCX = require('conceal-api')
 const ccx = new CCX({
   daemonHost: <daemonHost>, 
   walletHost: <walletHost>,
+  walletPath: <walletPath>,
   daemonRpcPort: <daemonRpcPort>,
   walletRpcPort: <walletRpcPort>,
+  walletRpcUser: <walletRpcUser>,
+  walletRpcPass: <walletRpcPass>,
   timeout: <timeout>
 })
 ```
