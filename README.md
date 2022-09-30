@@ -56,11 +56,11 @@ const ccx = new CCX({
   daemonHost: <daemonHost>, 
   walletHost: <walletHost>,
   walletPath: <walletPath>,
-  daemonRpcPort: <daemonRpcPort>,
-  walletRpcPort: <walletRpcPort>,
-  walletRpcUser: <walletRpcUser>,
-  walletRpcPass: <walletRpcPass>,
-  timeout: <timeout>
+  daemonRpcPort: <daemonRpcPort>, // port for daemon
+  walletRpcPort: <walletRpcPort>, // port for walletd
+  walletRpcUser: <walletRpcUser>, // optional, if not set no authentication will be made
+  walletRpcPass: <walletRpcPass>, // optional, if not set no authentication will be made
+  timeout: <timeout> // timeout for RPC calls
 })
 ```
 ccx.rpc returns a promise, where *rpc* is any of the methods below:
