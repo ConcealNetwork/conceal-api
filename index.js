@@ -47,6 +47,8 @@ function CCX(params) {
   this.walletPath = parseWallet ? parseWallet.pathname : null;
   this.walletRpcPort = params.walletRpcPort;
   this.daemonRpcPort = params.daemonRpcPort;
+  this.walletRpcUser = params.walletRpcUser;
+  this.walletRpcPass = params.walletRpcPass;
   this.timeout = params.timeout || 5000;
 
   // check daemon path and if its empty set it to emty string
@@ -63,7 +65,7 @@ function CCX(params) {
 // Wallet RPC -- concealwallet
 
 function wrpc(that, method, params, resolve, reject) {
-  request(that.walletProtocol, that.walletHost, that.walletRpcPort, 'POST', that.timeout, buildRpc(method, params), that.walletPath + '/json_rpc', resolve, reject);
+  request(that.walletProtocol, that.walletHost, that.walletRpcPort, 'POST', that.timeout, buildRpc(method, params), that.walletPath + '/json_rpc', that.walletRpcUser, that.walletRpcPass, resolve, reject);
 }
 
 CCX.prototype.outputs = function () {
@@ -355,7 +357,7 @@ CCX.prototype.getMessagesFromExtra = function (extra) {
 // Daemon RPC - JSON RPC
 
 function drpc(that, method, params, resolve, reject) {
-  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, 'POST', that.timeout, buildRpc(method, params), that.daemonPath + '/json_rpc', resolve, reject);
+  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, 'POST', that.timeout, buildRpc(method, params), that.daemonPath + '/json_rpc', null, null, resolve, reject);
 }
 
 CCX.prototype.count = function () {
@@ -443,7 +445,7 @@ CCX.prototype.submitBlock = function (block) {
 // Daemon RPC - JSON handlers
 
 function hrpc(that, params, path, resolve, reject) {
-  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, 'GET', that.timeout, JSON.stringify(params), that.daemonPath + path, resolve, reject);
+  request(that.daemonProtocol, that.daemonHost, that.daemonRpcPort, 'GET', that.timeout, JSON.stringify(params), that.daemonPath + path, null, null, resolve, reject);
 }
 
 CCX.prototype.info = function () {
@@ -521,33 +523,46 @@ function isHexString(str) { return (typeof str === 'string' && !/[^0-9a-fA-F]/.t
 
 function buildRpc(method, params) { return '{"jsonrpc":"2.0","id":"0","method":"' + method + '","params":' + JSON.stringify(params) + '}'; }
 
-function request(protocol, host, port, method, timeout, post, path, resolve, reject) {
-  const obj = {
+function request(protocol, host, port, method, timeout, post, path, user, pass, resolve, reject) {
+  let obj = {
     hostname: host,
     port: port,
     method: method,
     timeout: timeout,
     path: path,
-    headers: {
+    headers: {      
       'Content-Type': 'application/json',
       'Content-Length': post.length,
     }
   };
+
+  if (user && pass) {
+    obj.headers["Authorization"] = `Basic ${Buffer.from(user + ':' + pass).toString('base64')}`;
+  }
+
   var doRequest = protocol.request(
     obj,
     (res) => {
-      let data = Buffer.alloc(0);
-      res.on('data', (chunk) => { 
-        data = Buffer.concat([data, chunk]); 
-      });
-      res.on('end', () => {
-        try {
-          data = JSON.parse(data.toString());
-          if (data.error) { reject(data.error.message); return; }
-        } catch (error) { reject(error.message); return; }
-        if (data.result) data = data.result;
-        resolve(data);
-      });
+      if ((Math.floor(res.statusCode / 100) !== 2) && (Math.floor(res.statusCode / 100) !== 3)) {
+        if (res.statusCode === 401) {
+          reject('Authorization failed');
+        } else {
+          reject('RPC server error');
+        }
+      } else {
+        let data = Buffer.alloc(0);
+        res.on('data', (chunk) => { 
+          data = Buffer.concat([data, chunk]); 
+        });
+        res.on('end', () => {
+          try {
+            data = JSON.parse(data.toString());
+            if (data.error) { reject(data.error.message); return; }
+          } catch (error) { reject(error.message); return; }
+          if (data.result) data = data.result;
+          resolve(data);
+        });  
+      }
     }
   );
 
