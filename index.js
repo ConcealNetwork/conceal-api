@@ -301,6 +301,107 @@ CCX.prototype.sendTransaction = function (opts) {
   });
 };
 
+CCX.prototype.estimateFusion = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.threshold)) reject('treshold param is mandatory');
+    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr);
+    else {
+      if (Number.isInteger(opts.threshold)) {
+        wrpc(this, 'estimateFusion', opts, resolve, reject);
+      } else {
+        reject('treshold must be an integer');
+      }
+    }
+  });
+};
+
+CCX.prototype.sendFusionTransaction = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.threshold)) reject('treshold param is mandatory');
+    else if (!isUndefined(opts.addresses) && !arrayTest(opts.addresses, isAddress)) reject('addresses' + err.arr + ' of addresses each of which' + err.addr);
+    else {
+      opts.sourceAddresses = opts.addresses; delete opts.addresses;
+      if (isUndefined(opts.mixIn)) opts.mixIn = MIN_MIXIN;
+      if (!(opts.mixIn >= MIN_MIXIN && opts.mixIn <= MAX_MIXIN)) reject(MIN_MIXIN + ' <= mixIn <= ' + MAX_MIXIN);
+      else {
+        if ((opts.addresses.length == 1) && (!opts.destinationAddress)) {
+          opts.destinationAddress = opts.addresses[0];
+        } 
+        
+        if (!opts.destinationAddress) {
+          reject('destinationAddress must be specified in case you have more then one source address');
+        } else {
+          wrpc(this, 'sendFusionTransaction', opts, resolve, reject);
+        }
+      }
+    }
+  });
+};
+
+CCX.prototype.createDeposit = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.sourceAddress)) reject('sourceAddress param is mandatory');
+    else if (isUndefined(opts.amount)) reject('amount param is mandatory');
+    else if (isUndefined(opts.term)) reject('term param is mandatory');
+    else {
+      if (!isAddress(opts.sourceAddress)) reject('sourceAddress is not a valid address');      
+      else if (!Number.isInteger(opts.term)) reject('term is not a valid integer');  
+      else if (!isNumeric(opts.amount)) reject('amount is not a valid number');  
+      else {
+        wrpc(this, 'createDeposit', opts, resolve, reject);
+      }
+    }
+  });
+};
+
+CCX.prototype.sendDeposit = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.destinationAddress)) reject('destinationAddress param is mandatory');
+    else if (isUndefined(opts.sourceAddress)) reject('sourceAddress param is mandatory');
+    else if (isUndefined(opts.amount)) reject('amount param is mandatory');
+    else if (isUndefined(opts.term)) reject('term param is mandatory');
+    else {
+      if (!isAddress(opts.destinationAddress)) reject('destinationAddress is not a valid address');      
+      else if (!isAddress(opts.sourceAddress)) reject('sourceAddress is not a valid address');      
+      else if (!Number.isInteger(opts.term)) reject('term is not a valid integer');  
+      else if (!isNumeric(opts.amount)) reject('amount is not a valid number');  
+      else {
+        wrpc(this, 'sendDeposit', opts, resolve, reject);
+      }
+    }
+  });
+};
+
+CCX.prototype.getDeposit = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.depositId)) reject('depositId param is mandatory');
+    else {
+      if (!Number.isInteger(opts.depositId)) reject('depositId is not a valid integer');  
+      else {
+        wrpc(this, 'getDeposit', opts, resolve, reject);
+      }
+    }
+  });
+};
+
+CCX.prototype.withdrawDeposit = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.depositId)) reject('depositId param is mandatory');
+    else {
+      if (!Number.isInteger(opts.depositId)) reject('depositId is not a valid integer');  
+      else {
+        wrpc(this, 'withdrawDeposit', opts, resolve, reject);
+      }
+    }
+  });
+};
+
 CCX.prototype.createDelayedTransaction = function (opts) {
   return new Promise((resolve, reject) => {
     if (!isObject(opts)) reject(err.opts);
