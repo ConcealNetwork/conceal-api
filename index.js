@@ -16,6 +16,7 @@ const err = {
   hex64: ' must be 64-digit hexadecimal string',
   addr: ' must be 98-character string beginning with ccx',
   raw: ' must be a raw amount of CCX (X)',
+  privKey: ' must be a 64-character string',
   trans: ' must be a transfer object { address: 98-character string beginning with ccx, amount: raw amount of CCX (X), message: optional string }',
   arr: ' must be an array',
   str: ' must be a string'
@@ -126,6 +127,12 @@ CCX.prototype.reset = function () {
   });
 };
 
+CCX.prototype.save = function () {
+  return new Promise((resolve, reject) => {
+    wrpc(this, 'save', {}, resolve, reject);
+  });
+};
+
 CCX.prototype.optimize = function () {
   return new Promise((resolve, reject) => {
     wrpc(this, 'optimize', {}, resolve, reject);
@@ -192,6 +199,16 @@ CCX.prototype.getBalance = function (address) {
 CCX.prototype.createAddress = function () {
   return new Promise((resolve, reject) => {
     wrpc(this, 'createAddress', {}, resolve, reject);
+  });
+};
+
+CCX.prototype.createAddressList = function () {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.privateSpendKeys) || !arrayTest(opts.transfers, isPrivateKey)) reject('privateSpendKeys' + err.arr + ' of keys each of which' + err.privKey);
+    else {
+      wrpc(this, 'createAddressList', opts, resolve, reject);
+    }
   });
 };
 
@@ -455,6 +472,16 @@ CCX.prototype.getMessagesFromExtra = function (extra) {
   });
 };
 
+CCX.prototype.exportWallet = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.exportFilename)) reject('exportFilename is mandatory');
+    else {
+      wrpc(this, 'exportWallet', opts, resolve, reject);
+    }
+  });
+};
+
 // Daemon RPC - JSON RPC
 
 function drpc(that, method, params, resolve, reject) {
@@ -617,6 +644,8 @@ function isNonNegative(n) { return (Number.isInteger(n) && n >= 0); }
 function isNumeric(n) { return !isNaN(parseFloat(n)) && isFinite(n); }
 
 function isAddress(str) { return (typeof str === 'string' && str.length === 98 && str.slice(0, 3) === 'ccx'); }
+
+function isPrivateKey(str) { return (typeof str === 'string' && str.length === 64); }
 
 function isHex64String(str) { return (typeof str === 'string' && /^[0-9a-fA-F]{64}$/.test(str)); }
 
