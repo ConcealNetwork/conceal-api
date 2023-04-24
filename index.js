@@ -496,6 +496,16 @@ CCX.prototype.exportWallet = function (opts) {
   });
 };
 
+CCX.prototype.exportWalletKeys = function (opts) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(opts)) reject(err.opts);
+    else if (isUndefined(opts.exportFilename)) reject('exportFilename is mandatory');
+    else {
+      wrpc(this, 'exportWalletKeys', opts, resolve, reject);
+    }
+  });
+};
+
 // Daemon RPC - JSON RPC
 
 function drpc(that, method, params, resolve, reject) {
