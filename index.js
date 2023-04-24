@@ -15,6 +15,7 @@ const err = {
   opts: 'opts must be object',
   hex64: ' must be 64-digit hexadecimal string',
   addr: ' must be 98-character string beginning with ccx',
+  intAddr:  ' must be 186-character string beginning with ccx',
   raw: ' must be a raw amount of CCX (X)',
   privKey: ' must be a 64-character string',
   trans: ' must be a transfer object { address: 98-character string beginning with ccx, amount: raw amount of CCX (X), message: optional string }',
@@ -209,6 +210,21 @@ CCX.prototype.createAddressList = function () {
     else {
       wrpc(this, 'createAddressList', opts, resolve, reject);
     }
+  });
+};
+
+CCX.prototype.createIntegrated = function (address, paymentId) {
+  return new Promise((resolve, reject) => {
+    if (isUndefined(address) || !isAddress(address)) reject('address' + err.addr);
+    if (isUndefined(paymentId) || !isHex64String(paymentId)) reject('paymentId' + err.hex64);
+    wrpc(this, 'createIntegrated', { address: address, payment_id: paymentId }, resolve, reject);
+  });
+};
+
+CCX.prototype.splitIntegrated = function (address) {
+  return new Promise((resolve, reject) => {
+    if (isUndefined(address) || !isIntAddress(address)) reject('address' + err.intAddr);
+    wrpc(this, 'createIntegrated', { integrated_address: address }, resolve, reject);
   });
 };
 
@@ -644,6 +660,8 @@ function isNonNegative(n) { return (Number.isInteger(n) && n >= 0); }
 function isNumeric(n) { return !isNaN(parseFloat(n)) && isFinite(n); }
 
 function isAddress(str) { return (typeof str === 'string' && str.length === 98 && str.slice(0, 3) === 'ccx'); }
+
+function isIntAddress(str) { return (typeof str === 'string' && str.length === 186 && str.slice(0, 3) === 'ccx'); }
 
 function isPrivateKey(str) { return (typeof str === 'string' && str.length === 64); }
 
