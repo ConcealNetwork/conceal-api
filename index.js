@@ -409,27 +409,25 @@ CCX.prototype.sendDeposit = function (opts) {
   });
 };
 
-CCX.prototype.getDeposit = function (opts) {
+CCX.prototype.getDeposit = function (id) {
   return new Promise((resolve, reject) => {
-    if (!isObject(opts)) reject(err.opts);
-    else if (isUndefined(opts.depositId)) reject('depositId param is mandatory');
+    if (isUndefined(id)) reject('depositId param is mandatory');
     else {
-      if (!Number.isInteger(opts.depositId)) reject('depositId is not a valid integer');  
+      if (!Number.isInteger(id)) reject('depositId is not a valid integer');  
       else {
-        wrpc(this, 'getDeposit', opts, resolve, reject);
+        wrpc(this, 'getDeposit', { depositId: id }, resolve, reject);
       }
     }
   });
 };
 
-CCX.prototype.withdrawDeposit = function (opts) {
+CCX.prototype.withdrawDeposit = function (id) {
   return new Promise((resolve, reject) => {
-    if (!isObject(opts)) reject(err.opts);
-    else if (isUndefined(opts.depositId)) reject('depositId param is mandatory');
+    if (isUndefined(id)) reject('depositId param is mandatory');
     else {
-      if (!Number.isInteger(opts.depositId)) reject('depositId is not a valid integer');  
+      if (!Number.isInteger(id)) reject('depositId is not a valid integer');  
       else {
-        wrpc(this, 'withdrawDeposit', opts, resolve, reject);
+        wrpc(this, 'withdrawDeposit', { depositId: id }, resolve, reject);
       }
     }
   });
