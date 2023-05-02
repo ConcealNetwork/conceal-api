@@ -301,12 +301,32 @@ ccx.getMessagesFromExtra(extra)
 ```
 #### <a name="createDeposit">Create Deposit (walletd)
 ```
-const opts = { // either blockHash or firstBlockIndex is required
-  sourceAddress: BLOCK_HASH, // Wallet address (string), ex: 'ccx7Xd...'
-  amount: FIRST_BLOCK_INDEX, //The amount to deposit (integer), ex: 12750
-  term: BLOCK_COUNT, // The length of the deposit (integer, minimum 21,900) ex: 5600
+const opts = {
+  sourceAddress: ADDRESS, // Wallet address (string), ex: 'ccx7Xd...'
+  amount: AMOUNT, //The amount to deposit (integer), ex: 12750
+  term: TERM, // The length of the deposit (integer, minimum 21,900) ex: 5600
 }
 ccx.createDeposit(opts)
+```
+#### <a name="sendDeposit">Send Deposit (walletd)
+```
+const opts = {
+  sourceAddress: ADDRESS, // Wallet address (string), ex: 'ccx7Xd...'
+  amount: AMOUNT, //The amount to deposit (integer), ex: 12750
+  term: TERM, // The length of the deposit (integer, minimum 21,900) ex: 5600,
+  destinationAddress: ADDRESS // Wallet address of receiver (string), ex: 'ccx7Xd...'
+}
+ccx.sendDeposit(opts)
+```
+#### <a name="getDeposit">Get Deposit (walletd)
+```
+const id = DEPOSIT_ID // Id of the deposit (integer, required), ex: '1'
+ccx.getDeposit(id)
+```
+#### <a name="withdrawDeposit">Withdraw Deposit (walletd)
+```
+const id = DEPOSIT_ID // Id of the deposit (integer, required), ex: '1'
+ccx.withdrawDeposit(id)
 ```
 ### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 
