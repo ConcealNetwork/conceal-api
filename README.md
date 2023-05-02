@@ -97,6 +97,10 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Delete delayed transaction](#deleteDelayedTransaction)
     * [Send delayed transaction](#sendDelayedTransaction)
     * [Get incoming messages from transaction extra field](#getMessagesFromExtra)
+    * [Create Deposit](#createDeposit)
+    * [Send Deposit](#sendDeposit)
+    * [Get Deposit](#getDeposit)
+    * [Withdraw Deposit](#withdrawDeposit)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
@@ -294,6 +298,15 @@ ccx.sendDelayedTransaction(hash)
 ```
 const extra = EXTRA // (hex string, required), ex: '0199...c3ca'
 ccx.getMessagesFromExtra(extra)
+```
+#### <a name="createDeposit">Create Deposit (walletd)
+```
+const opts = { // either blockHash or firstBlockIndex is required
+  sourceAddress: BLOCK_HASH, // Wallet address (string), ex: 'ccx7Xd...'
+  amount: FIRST_BLOCK_INDEX, //The amount to deposit (integer), ex: 12750
+  term: BLOCK_COUNT, // The length of the deposit (integer, minimum 21,900) ex: 5600
+}
+ccx.createDeposit(opts)
 ```
 ### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 
