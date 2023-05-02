@@ -100,7 +100,7 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Create Deposit](#createDeposit)
     * [Send Deposit](#sendDeposit)
     * [Get Deposit](#getDeposit)
-    * [Withdraw Deposit](#withdrawDeposit)
+    * [Withdraw Deposit](#withdraw-deposit-walletd)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
