@@ -75,6 +75,8 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get number of unlocked outputs](#outputs)
     * [Reset wallet](#reset)
     * [Store wallet](#store)
+    * [Export wallet](#export-wallet-concealwallet)
+    * [Export wallet keys](#export-wallet-keys-concealwallet)
     * [Optimize wallet](#optimize)
     * [Send transfers](#send)
   * walletd
@@ -160,6 +162,16 @@ ccx.reset() // discard wallet cache and resync with block chain
 #### <a name="store">Store wallet (concealwallet)
 ```
 ccx.store() // save wallet cache to disk
+```
+#### <a name="exportWallet">Export wallet (concealwallet)
+```
+const exportFilename = FILE_NAME // (string, required), ex: 'wallet.dat'
+ccx.exportWallet(exportFilename) // save wallet cache to disk
+```  
+#### <a name="exportWalletKeys">Export wallet keys (concealwallet)
+```
+const exportFilename = FILE_NAME // (string, required), ex: 'walletKeys.dat'
+ccx.exportWalletKeys(exportFilename) // save wallet cache to disk
 ```
 #### <a name="optimize">Optimize wallet (concealwallet)
 ```
