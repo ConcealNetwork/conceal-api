@@ -80,10 +80,11 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
   * walletd
     * [Reset or replace wallet](#resetOrReplace)
     * [Get status](#status)
-    * [Get balance](#getBalance)
-    * [Create address](#createAddress)
-    * [Delete address](#deleteAddress)
-    * [Get addresses](#getAddresses)
+    * [Get balance](#get-balance-walletd)
+    * [Create address](#create-address-walletd)
+    * [Create address list](#create-address-list-walletd)
+    * [Delete address](#delete-address-walletd)
+    * [Get addresses](#get-addresses-walletd)
     * [Get view secret Key](#get-view-secret-key-walletd)
     * [Get spend keys](#get-spend-keys-walletd)
     * [Get block hashes](#get-block-hashes-walletd)
@@ -191,6 +192,14 @@ ccx.getBalance(address)
 #### <a name="createAddress">Create address (walletd)
 ```
 ccx.createAddress()
+```
+#### <a name="createAddressList">Create address (walletd)
+```
+const opts = {
+  privateSpendKeys: [KEYS], // Private spend keys to import (array, 64-digit hex string), ex: '0ab1...3f4b'
+  reset: RESET, //Determines whether reset wallet or not. Defaults to false
+}
+ccx.createAddressList(opts)
 ```
 #### <a name="deleteAddress">Delete address (walletd)
 ```
