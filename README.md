@@ -85,6 +85,8 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Create address list](#create-address-list-walletd)
     * [Delete address](#delete-address-walletd)
     * [Get addresses](#get-addresses-walletd)
+    * [Create integrated](#create-integrated-walletd)
+    * [Split integrated](#split-integrated-walletd)
     * [Get view secret Key](#get-view-secret-key-walletd)
     * [Get spend keys](#get-spend-keys-walletd)
     * [Get block hashes](#get-block-hashes-walletd)
@@ -196,7 +198,7 @@ ccx.createAddress()
 #### <a name="createAddressList">Create address (walletd)
 ```
 const opts = {
-  privateSpendKeys: [KEYS], // Private spend keys to import (array, 64-digit hex string), ex: '0ab1...3f4b'
+  privateSpendKeys: [PRIVATE_SPEND_KEY], // Private spend keys to import (array, 64-digit hex string), ex: '0ab1...3f4b'
   reset: RESET, //Determines whether reset wallet or not. Defaults to false
 }
 ccx.createAddressList(opts)
@@ -209,6 +211,17 @@ ccx.deleteAddress(address)
 #### <a name="getAddresses">Get addresses (walletd)
 ```
 ccx.getAddresses()
+```
+#### <a name="createIntegrated">Reset or replace wallet (walletd)
+```
+const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
+const paymentId = PAYMENT_ID // (64-digit hex string, optional), ex: '0ab1...3f4b'
+ccx.createIntegrated(address,paymentId) // If no key, wallet is re-synced. If key, a new address is created from the key for a new wallet.
+```
+#### <a name="splitIntegrated">Reset or replace wallet (walletd)
+```
+const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
+ccx.splitIntegrated(address) // If no key, wallet is re-synced. If key, a new address is created from the key for a new wallet.
 ```
 #### <a name="getViewSecretKey">Get view secret key (walletd)
 ```
