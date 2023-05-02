@@ -85,8 +85,8 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Create address list](#create-address-list-walletd)
     * [Delete address](#delete-address-walletd)
     * [Get addresses](#get-addresses-walletd)
-    * [Create integrated](#create-integrated-walletd)
-    * [Split integrated](#split-integrated-walletd)
+    * [Create integrated](#create-integrated-address-walletd)
+    * [Split integrated](#split-integrated-address-walletd)
     * [Get view secret Key](#get-view-secret-key-walletd)
     * [Get spend keys](#get-spend-keys-walletd)
     * [Get block hashes](#get-block-hashes-walletd)
@@ -212,13 +212,13 @@ ccx.deleteAddress(address)
 ```
 ccx.getAddresses()
 ```
-#### <a name="createIntegrated">Reset or replace wallet (walletd)
+#### <a name="createIntegrated">Create integrated address (walletd)
 ```
 const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
 const paymentId = PAYMENT_ID // (64-digit hex string, optional), ex: '0ab1...3f4b'
 ccx.createIntegrated(address,paymentId) // If no key, wallet is re-synced. If key, a new address is created from the key for a new wallet.
 ```
-#### <a name="splitIntegrated">Reset or replace wallet (walletd)
+#### <a name="splitIntegrated">Split integrated address (walletd)
 ```
 const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
 ccx.splitIntegrated(address) // If no key, wallet is re-synced. If key, a new address is created from the key for a new wallet.
