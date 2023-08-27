@@ -75,28 +75,37 @@ ccx.rpc returns a promise, where *rpc* is any of the methods below:
     * [Get number of unlocked outputs](#outputs)
     * [Reset wallet](#reset)
     * [Store wallet](#store)
+    * [Export wallet](#export-wallet-concealwallet)
+    * [Export wallet keys](#export-wallet-keys-concealwallet)
     * [Optimize wallet](#optimize)
     * [Send transfers](#send)
   * walletd
     * [Reset or replace wallet](#resetOrReplace)
     * [Get status](#status)
-    * [Get balance](#getBalance)
-    * [Create address](#createAddress)
-    * [Delete address](#deleteAddress)
-    * [Get addresses](#getAddresses)
-    * [Get view secret Key](#getViewSecretKey)
-    * [Get spend keys](#getSpendKeys)
-    * [Get block hashes](#getBlockHashes)
-    * [Get transaction](#getTransaction)
-    * [Get unconfirmed transactions](#getUnconfirmedTransactions)
-    * [Get transaction hashes](#getTransactionHashes)
-    * [Get transactions](#getTransactions)
-    * [Send transaction](#sendTransaction)
-    * [Create delayed transaction](#createDelayedTransaction)
-    * [Get delayed transaction hashes](#getDelayedTransactionHashes)
-    * [Delete delayed transaction](#deleteDelayedTransaction)
-    * [Send delayed transaction](#sendDelayedTransaction)
-    * [Get incoming messages from transaction extra field](#getMessagesFromExtra)
+    * [Get balance](#get-balance-walletd)
+    * [Create address](#create-address-walletd)
+    * [Create address list](#create-address-list-walletd)
+    * [Delete address](#delete-address-walletd)
+    * [Get addresses](#get-addresses-walletd)
+    * [Create integrated](#create-integrated-address-walletd)
+    * [Split integrated](#split-integrated-address-walletd)
+    * [Get view secret Key](#get-view-secret-key-walletd)
+    * [Get spend keys](#get-spend-keys-walletd)
+    * [Get block hashes](#get-block-hashes-walletd)
+    * [Get transaction](#get-transaction-walletd)
+    * [Get unconfirmed transactions](#get-unconfirmed-transactions-walletd)
+    * [Get transaction hashes](#get-transaction-hashes-walletd)
+    * [Get transactions](#get-transactions-walletd)
+    * [Send transaction](#send-transaction-walletd)
+    * [Create delayed transaction](#create-delayed-transaction-walletd)
+    * [Get delayed transaction hashes](#get-delayed-transaction-hashes-walletd)
+    * [Delete delayed transaction](#delete-delayed-transaction-walletd)
+    * [Send delayed transaction](#send-delayed-transation-walletd)
+    * [Get incoming messages from transaction extra field](#get-incoming-messages-from-transaction-extra-field-walletd)
+    * [Create Deposit](#create-deposit-walletd)
+    * [Send Deposit](#send-deposit-walletd)
+    * [Get Deposit](#get-deposit-walletd)
+    * [Withdraw Deposit](#withdraw-deposit-walletd)
 * [Daemon RPC (must provide daemonRpcPort)](#daemon)
   * [Get info](#info)
   * [Get index](#index)
@@ -154,6 +163,16 @@ ccx.reset() // discard wallet cache and resync with block chain
 ```
 ccx.store() // save wallet cache to disk
 ```
+#### <a name="exportWallet">Export wallet (concealwallet)
+```
+const exportFilename = FILE_NAME // (string, required), ex: 'wallet.dat'
+ccx.exportWallet(exportFilename) // save wallet cache to disk
+```  
+#### <a name="exportWalletKeys">Export wallet keys (concealwallet)
+```
+const exportFilename = FILE_NAME // (string, required), ex: 'walletKeys.dat'
+ccx.exportWalletKeys(exportFilename) // save wallet cache to disk
+```
 #### <a name="optimize">Optimize wallet (concealwallet)
 ```
 ccx.optimize() // combines many available outputs into a few by sending to self
@@ -188,6 +207,14 @@ ccx.getBalance(address)
 ```
 ccx.createAddress()
 ```
+#### <a name="createAddressList">Create address (walletd)
+```
+const opts = {
+  privateSpendKeys: [PRIVATE_SPEND_KEY], // Private spend keys to import (array, 64-digit hex string), ex: '0ab1...3f4b'
+  reset: RESET, //Determines whether reset wallet or not. Defaults to false
+}
+ccx.createAddressList(opts)
+```
 #### <a name="deleteAddress">Delete address (walletd)
 ```
 const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
@@ -196,6 +223,17 @@ ccx.deleteAddress(address)
 #### <a name="getAddresses">Get addresses (walletd)
 ```
 ccx.getAddresses()
+```
+#### <a name="createIntegrated">Create integrated address (walletd)
+```
+const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
+const paymentId = PAYMENT_ID // (64-digit hex string, optional), ex: '0ab1...3f4b'
+ccx.createIntegrated(address,paymentId) // If no key, wallet is re-synced. If key, a new address is created from the key for a new wallet.
+```
+#### <a name="splitIntegrated">Split integrated address (walletd)
+```
+const address = ADDRESS // (string, required), ex: 'ccx7Xd...'
+ccx.splitIntegrated(address) // If no key, wallet is re-synced. If key, a new address is created from the key for a new wallet.
 ```
 #### <a name="getViewSecretKey">Get view secret key (walletd)
 ```
@@ -294,6 +332,35 @@ ccx.sendDelayedTransaction(hash)
 ```
 const extra = EXTRA // (hex string, required), ex: '0199...c3ca'
 ccx.getMessagesFromExtra(extra)
+```
+#### <a name="createDeposit">Create Deposit (walletd)
+```
+const opts = {
+  sourceAddress: ADDRESS, // Wallet address (string), ex: 'ccx7Xd...'
+  amount: AMOUNT, //The amount to deposit (integer), ex: 12750
+  term: TERM, // The length of the deposit (integer, minimum 21,900) ex: 5600
+}
+ccx.createDeposit(opts)
+```
+#### <a name="sendDeposit">Send Deposit (walletd)
+```
+const opts = {
+  sourceAddress: ADDRESS, // Wallet address (string), ex: 'ccx7Xd...'
+  amount: AMOUNT, //The amount to deposit (integer), ex: 12750
+  term: TERM, // The length of the deposit (integer, minimum 21,900) ex: 5600,
+  destinationAddress: ADDRESS // Wallet address of receiver (string), ex: 'ccx7Xd...'
+}
+ccx.sendDeposit(opts)
+```
+#### <a name="getDeposit">Get Deposit (walletd)
+```
+const id = DEPOSIT_ID // Id of the deposit (integer, required), ex: '1'
+ccx.getDeposit(id)
+```
+#### <a name="withdrawDeposit">Withdraw Deposit (walletd)
+```
+const id = DEPOSIT_ID // Id of the deposit (integer, required), ex: '1'
+ccx.withdrawDeposit(id)
 ```
 ### <a name="daemon">Daemon RPC (must provide daemonRpcPort)
 
