@@ -62,6 +62,17 @@ function CCX(params) {
   if ((this.walletPath == '/') || (!this.walletPath)) {
     this.walletPath = "";
   }
+
+  // check daemon port and if its empty set it to 80 or 433
+  if (!this.daemonRpcPort) {
+    if (this.daemonProtocol == http) {
+      this.daemonRpcPort = 80;
+    } else if (this.daemonProtocol == https) {
+      this.daemonRpcPort = 443;
+    }
+  }
+
+  console.log()
 }
 
 // Wallet RPC -- concealwallet
