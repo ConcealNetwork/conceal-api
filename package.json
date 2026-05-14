@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/ConcealNetwork/conceal-api#readme",
   "dependencies": {
-    "follow-redirects": "^1.15.2"
+    "follow-redirects": "^1.16.0"
   }
 }
